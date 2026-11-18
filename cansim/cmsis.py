@@ -1,4 +1,3 @@
-"""Pobieranie oficjalnych naglowkow ST (CMSIS device) do third_party/: przez git, a bez gita przez archiwum ZIP z GitHub."""
 import io
 import shutil
 import subprocess

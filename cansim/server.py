@@ -1,4 +1,3 @@
-"""Serwer HTTP (tylko biblioteka standardowa) + CLI: python -m cansim projekt.json"""
 import argparse, json, mimetypes, threading, webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path

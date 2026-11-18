@@ -1,15 +1,3 @@
-"""Instrumentacja zrodel C przed kompilacja na PC.
-
-Co robi (kod uzytkownika na dysku NIE jest zmieniany, powstaja kopie):
-  1. Dostep do rejestrow peryferiow `FDCAN1->IR`, `GPIOD->MODER |= x`, `CAN1->sTxMailBox[0].TIR = y`
-     zamienia na wywolania CANSIM_RD/CANSIM_WR, dzieki czemu model sprzetu widzi kazdy odczyt i zapis
-     (konieczne m.in. do poprawnego "zapis 1 kasuje flage").
-  2. Makra wskazujace na Message RAM (0x4000AC00 / SRAMCAN_BASE) przekierowuje na tablice w pamieci PC.
-  3. Na poczatku kazdej funkcji wstawia CANSIM_FN("nazwa") (sledzenie wywolan).
-  4. Opcjonalnie podmienia cialo wskazanych funkcji (np. petle opozniajace) na wersje dla symulatora.
-Ograniczenia: wskaznik na peryferium (`FDCAN_GlobalTypeDef *p = FDCAN1; p->IR`) i adres `&FDCAN1->DR`
-nie sa przechwytywane.
-"""
 import re
 
 KEYWORDS = {"if", "for", "while", "switch", "return", "sizeof", "do", "else", "case"}

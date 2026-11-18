@@ -1,13 +1,3 @@
-"""Model kontrolera FDCAN (M_CAN) z STM32H7, tryb classic CAN. Zachowanie wg RM0433 / M_CAN User's Manual
-w interpretacji autora symulatora. Nazwy rejestrow i pozycje bitow pochodza z oficjalnego naglowka ST.
-
-Zasymulowane: INIT/CCE i chronione rejestry, bit timing (bitrate), filtry standardowe (SFT/SFEC), dedykowane bufory Rx
-(z blokada przy ustawionym NDAT: filtr wskazujacy taki bufor "nie pasuje" i filtrowanie idzie dalej, wg M_CAN) i FIFO0
-(tryb blokujacy i nadpisujacy F0OM), dedykowane bufory Tx (TXBAR/TXBRP/TXBCR/TXBTO/TXBCF), CCCR.DAR, liczniki TEC/REC,
-Error Warning/Passive/Bus-Off (odzyskiwanie: programowe INIT=0 i 129 x 11 bitow recesywnych, wg RM0433), PSR.LEC
-(7 po odczycie PSR, 0 po poprawnej ramce), flagi IR/IE/ILS/ILE i dwie linie przerwan. Pominiete: CAN FD (faza danych), filtry rozszerzone, Tx FIFO/queue, time stamp,
-Tx Event FIFO, tryby testowe.
-"""
 from ..bus import BusNode, Frame, NS
 from .base import Peripheral
 

@@ -1,4 +1,3 @@
-"""Budowanie projektu: kopia zrodel z instrumentacja + wygenerowane pliki + gcc -> biblioteka wspoldzielona."""
 import json, os, re, shutil, subprocess, sys
 from dataclasses import dataclass, field
 from pathlib import Path

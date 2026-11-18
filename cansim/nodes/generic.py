@@ -1,4 +1,3 @@
-"""Wezly pomocnicze: analizator/nadajnik (np. komputer z adapterem USB-CAN) i slup bez odpowiedzi."""
 from ..bus import BusNode, ErrorCounters, Frame
 
 

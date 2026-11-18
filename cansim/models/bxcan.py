@@ -1,12 +1,3 @@
-"""Model kontrolera bxCAN (STM32F4/F2/F1/F3, CAN_TypeDef). Zachowanie wg RM0090 rozdz. 32 w interpretacji autora symulatora.
-Nazwy rejestrow i pozycje bitow MCR/MSR/TSR/RFxR/IER/ESR/BTR pochodza z oficjalnego naglowka ST.
-
-Zasymulowane: tryby sleep/initialization/normal (z opoznieniem synchronizacji 11 bitow), BTR chronione (tylko INAK=1),
-3 skrzynki nadawcze (priorytet po ID albo kolejnosc zlecen: TXFP), NART, ABOM, ABRQ, 2 kolejki odbiorcze FIFO po 3 ramki
-(RFOM, FULL, FOVR, RFLM), banki filtrow (maska/lista, 16/32 bity, przypisanie do FIFO, FINIT, FACT, numer FMI),
-licznik TEC/REC, Error Warning/Passive/Bus-Off z odzyskiwaniem, cztery linie przerwan (TX, RX0, RX1, SCE).
-Pominiete: Time Triggered, tryb silent/loopback (bity sa przechowywane, ale bez efektu), wake-up, ALST (przegrana arbitrazu).
-"""
 from ..bus import BusNode, Frame, NS
 from .base import Peripheral
 

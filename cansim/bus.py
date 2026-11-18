@@ -1,4 +1,3 @@
-"""Magistrala CAN: arbitraz, czas trwania ramki (z prawdziwym CRC15 i wstawianiem bitow), ACK, bledy."""
 from dataclasses import dataclass, field
 
 NS = 1_000_000_000

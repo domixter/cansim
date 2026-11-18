@@ -1,7 +1,3 @@
-"""Czytanie oficjalnego naglowka CMSIS ST (stm32h743xx.h itp.): peryferia, rejestry, pola bitowe, IRQ.
-
-Dzieki temu nazwy i pozycje bitow pochodza od ST, a nie z pamieci autora symulatora.
-"""
 import re
 from dataclasses import dataclass, field
 

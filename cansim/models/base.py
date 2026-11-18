@@ -1,6 +1,3 @@
-"""Modele peryferiow. Bazowy model "pamiec" + male modele RCC, USART, timerow, zeby kod startowy nie wisial."""
-
-
 class Peripheral:
     """Model jednego peryferium. Rejestry wg oficjalnego rozkladu ST (dev.layouts)."""
     irq_names = ()

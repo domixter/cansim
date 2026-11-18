@@ -1,9 +1,3 @@
-"""Konsola komend: reczne sterowanie symulacja, z podpowiedziami argumentow. Te same komendy dzialaja w scenariuszach
-(kilka linii wykonywanych po kolei; `czekaj` przesuwa czas symulacji).
-
-Odniesienia do elementow: plytka po nazwie bez spacji (np. Sterownik_H743) albo id (b1); ODrive po numerze node_id
-(albo * = wszystkie); wezel generyczny po nazwie bez spacji albo id.
-"""
 import re
 import shlex
 

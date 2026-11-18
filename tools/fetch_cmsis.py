@@ -1,4 +1,3 @@
-"""Pobiera oficjalne naglowki ST do third_party/ (git albo ZIP z GitHub). Uzycie: python tools/fetch_cmsis.py [h7] [f4]"""
 import sys
 from pathlib import Path
 

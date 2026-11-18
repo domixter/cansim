@@ -1,8 +1,3 @@
-"""Uproszczony model ODrive (protokol CANSimple). Zachowanie zgodne z dokumentacja ODrive 0.5.x, nie z prawdziwym urzadzeniem.
-
-ID ramki = (node_id << 5) | cmd_id. Dane w little-endian.
-Niepewne (do sprawdzenia na Waszej wersji firmware): uklad bajtow heartbeatu poza bajtami 0..4.
-"""
 import struct
 from ..bus import BusNode, ErrorCounters, Frame, NS
 

@@ -1,19 +1,3 @@
-"""Opis systemu (schemat magistrali: plytki, wezly, kabel, terminatory) i sprawdzanie regul elektrycznych/czasowych (ERC).
-
-Plik cansim_system.json:
-{
-  "name": "Robot",
-  "bus": {"length_m": 3.0, "ns_per_m": 5.0},
-  "boards": [{"id": "b1", "name": "Main H743", "project": "h7_demo/cansim_project.json", "pos_m": 0,
-              "termination": true, "transceiver": "TJA1042", "vcc": 5.0, "stub_m": 0.05, "gnd": true, "osc_ppm": 50}],
-  "nodes":  [{"id": "n1", "type": "odrive", "node_id": 1, "pos_m": 1.0, "termination": false, ...},
-             {"id": "t1", "type": "terminator", "pos_m": 3.0}]
-}
-Dla pojedynczego pliku cansim_project.json system powstaje automatycznie (plytka + wezly z "nodes").
-
-Zrodla regul: ISO 11898-2 (terminacja 2 x 120 Ω, odgalezienia), ISO 11898-1 / Bosch CAN 2.0 (bit timing, tolerancja
-oscylatora), karty katalogowe transceiverow (zakresy zasilania). Wartosci opoznien transceiverow sa orientacyjne.
-"""
 import json
 import math
 import os

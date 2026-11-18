@@ -1,4 +1,3 @@
-"""Warstwa aplikacji: system (schemat), kompilacja plytek, swiat symulacji, watek czasu. Uzywana przez serwer HTTP."""
 import os
 import re
 import shutil

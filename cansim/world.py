@@ -1,4 +1,3 @@
-"""Swiat symulacji: wspolny czas wirtualny, jedna magistrala CAN, wiele plytek (Engine) i wezlow zewnetrznych."""
 import threading
 from collections import deque
 

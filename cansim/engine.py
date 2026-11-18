@@ -1,13 +1,3 @@
-"""Silnik symulacji: wirtualny czas, firmware w watkach (kooperacyjnie), NVIC, przerwania, magistrala.
-
-Model wykonania:
-  * Czas jest wirtualny (nanosekundy). Plynie tylko, gdy firmware czeka (opoznienie, petla oczekujaca) albo gdy
-    uzytkownik uruchomi/krokuje symulacje.
-  * main() i funkcje wolane z UI dzialaja kazda w swoim watku, ale tylko jeden watek (silnik albo jedno zadanie)
-    wykonuje sie w danej chwili: zadanie oddaje sterowanie przy opoznieniu, petli oczekujacej albo po wielu odczytach rejestrow.
-  * Przerwania wykonuja sie w watku silnika, gdy zadanie jest wstrzymane (czyli jak przerwanie w trakcie opoznienia).
-    Nie ma wywlaszczania w srodku funkcji (uproszczenie).
-"""
 import ctypes, ctypes.util, itertools, os, shutil, threading
 from collections import deque, Counter
 

@@ -1,9 +1,3 @@
-"""Symbole firmware dla UI i konsoli: funkcje (z typami argumentow) i zmienne globalne, wyczytane z plikow zrodlowych.
-
-Parser jest heurystyczny (bez pelnej analizy C): deklaracje na najwyzszym poziomie pliku, po usunieciu komentarzy,
-napisow i dyrektyw preprocesora. Zmienne i funkcje `static` sa oznaczone jako niedostepne z zewnatrz (nie ma ich
-w tablicy symboli biblioteki, wiec nie da sie ich czytac ani wolac).
-"""
 import re
 
 from .rewrite import mask, _define_spans
