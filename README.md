@@ -53,7 +53,7 @@ Pythona (tylko biblioteka standardowa). Opcje: `python -m cansim [plik.json] [--
 1. Na ekranie startowym wybierz **Płytka z moim kodem** (folder z plikami `.c/.h`; pliki źródłowe i katalogi nagłówków
    wykryją się same) albo **Nowa płytka od zera** (powstanie folder z działającym szablonem `main.c` dla H7 albo F4).
 2. Dodaj resztę magistrali przyciskami po lewej: **ODrive**, **Węzeł** (np. PC z USB-CAN), **Terminator 120 Ω**.
-3. **▶ Start** (spacja) albo **+1 / +10 / +100 ms**. Pasek pod menu pokazuje, co się dzieje; przycisk **?** objaśnia
+3. **Start** (spacja) albo **+1 / +10 / +100 ms**. Pasek pod menu pokazuje, co się dzieje; przycisk **?** objaśnia
    bieżącą zakładkę, a **Pomoc** zawiera przewodnik i słowniczek.
 4. **Zapisz** (Ctrl+S) zapisuje cały schemat do `cansim_system.json`.
 
