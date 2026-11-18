@@ -1,0 +1,22 @@
+# artefakty kompilacji symulatora (tworzone obok kodu kazdej plytki)
+.cansim_build/
+# oficjalne naglowki ST pobierane skryptem (nie sa czescia repozytorium)
+third_party/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+# system / edytory
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+# narzedzie deweloperskie (test interfejsu), nie jest potrzebne do uzywania programu
+tools/e2e_ui.mjs
+# lokalne pliki uzytkownika
+*.log
+/cansim_system.json

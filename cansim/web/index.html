@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><script>try{const t=localStorage.getItem("cansim_theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script><title>cansim</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#e9ecf1;--panel:#fff;--panel2:#f6f7f9;--fg:#0f1419;--mut:#46505c;--faint:#6b7480;--line:#c9ced6;--line2:#e3e6eb;--acc:#1d4ed8;--acc-fg:#fff;--acc2:#dbe6ff;
+--ok:#0f7a34;--okb:#dcf3e4;--bad:#b91c1c;--badb:#fde3e3;--warn:#92400e;--warnb:#fdefd3;--chg:#fff0a0;--canh:#c2410c;--canl:#1d4ed8;--gnd:#4b5563;--top:#111827;--top-fg:#f9fafb;
+--mono:ui-monospace,SFMono-Regular,Consolas,"Cascadia Mono",monospace}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b0e13;--panel:#151a21;--panel2:#1c222b;--fg:#f2f4f7;--mut:#b4bcc7;--faint:#8b95a1;--line:#38414d;--line2:#272e38;--acc:#4c8dff;--acc-fg:#fff;--acc2:#1d2c47;
+--ok:#4ade80;--okb:#12301f;--bad:#f87171;--badb:#3b1515;--warn:#fbbf24;--warnb:#3a2c0b;--chg:#4d4300;--canh:#fb923c;--canl:#60a5fa;--gnd:#9ca3af;--top:#05070a;--top-fg:#f9fafb}}
+:root[data-theme=dark]{--bg:#0b0e13;--panel:#151a21;--panel2:#1c222b;--fg:#f2f4f7;--mut:#b4bcc7;--faint:#8b95a1;--line:#38414d;--line2:#272e38;--acc:#4c8dff;--acc-fg:#fff;--acc2:#1d2c47;
+--ok:#4ade80;--okb:#12301f;--bad:#f87171;--badb:#3b1515;--warn:#fbbf24;--warnb:#3a2c0b;--chg:#4d4300;--canh:#fb923c;--canl:#60a5fa;--gnd:#9ca3af;--top:#05070a;--top-fg:#f9fafb}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font:14px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg);display:flex;flex-direction:column;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+input,textarea,select{background:var(--panel)}input:focus,textarea:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
+button{cursor:pointer;white-space:nowrap;font-weight:500}button:hover{border-color:var(--acc);color:var(--acc)}button:disabled{opacity:.5;cursor:default}
+button.pri{background:var(--acc);color:var(--acc-fg);border-color:var(--acc)}button.pri:hover{filter:brightness(1.1);color:var(--acc-fg)}
+button.danger{color:var(--bad);border-color:var(--bad)}button.sm{padding:2px 8px;font-size:12.5px}button.ghost{border-color:transparent;background:none}
+/* pasek gorny */
+header{display:flex;gap:6px;align-items:center;padding:7px 12px;background:var(--top);color:var(--top-fg);flex-wrap:wrap}
+header h1{font-size:17px;margin:0 10px 0 2px;letter-spacing:-.02em;font-weight:700}header h1 span{color:#60a5fa}
+header button,header select{background:#1f2937;border-color:#374151;color:#f3f4f6}header button:hover{border-color:#60a5fa;color:#fff}
+header button.go{background:#16a34a;border-color:#16a34a;color:#fff;font-weight:700;min-width:96px}header button.go.stop{background:#d97706;border-color:#d97706}
+.grp{display:flex;gap:4px;align-items:center;padding:0 8px;border-left:1px solid #374151}.grp:first-of-type{border-left:0}
+.lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-right:2px}
+.chip{padding:3px 10px;border-radius:12px;background:#1f2937;color:#d1d5db;font-size:12.5px;white-space:nowrap}.chip b{color:#fff}
+.chip.bad{background:#7f1d1d;color:#fecaca}.chip.warn{background:#78350f;color:#fde68a}.chip.ok{background:#14532d;color:#bbf7d0}
+#hint{padding:6px 14px;font-size:13px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
+#hint .ic{font-weight:700;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+#hint.ok .ic{background:var(--okb);color:var(--ok)}#hint.warn .ic{background:var(--warnb);color:var(--warn)}#hint.bad .ic{background:var(--badb);color:var(--bad)}#hint.info .ic{background:var(--acc2);color:var(--acc)}
+/* uklad */
+#app{flex:1;display:grid;grid-template-columns:240px 1fr 340px;grid-template-rows:1fr auto;gap:8px;padding:8px;min-height:0}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+h2{font-size:12px;margin:0;padding:8px 12px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700;display:flex;justify-content:space-between;align-items:center;background:var(--panel2)}
+h3{font-size:12px;margin:14px 0 6px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.body{overflow:auto;padding:10px 12px;flex:1;min-height:0}
+.mut{color:var(--mut)}.faint{color:var(--faint)}.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+/* elementy */
+.part{display:flex;gap:9px;align-items:center;padding:7px 8px;border-radius:8px;cursor:pointer;margin-bottom:3px;border:1px solid transparent}
+.part:hover{background:var(--panel2);border-color:var(--line2)}.part.sel{background:var(--acc2);border-color:var(--acc)}
+.part .nm{flex:1;min-width:0}.part .nm b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.part .nm small{color:var(--mut);font-size:12px}
+.dot{width:11px;height:11px;border-radius:50%;flex:none;background:var(--faint);box-shadow:0 0 0 2px var(--panel)}.dot.ok{background:var(--ok)}.dot.warn{background:#f59e0b}.dot.bad{background:var(--bad)}.dot.term{background:none;border:2px solid var(--faint);border-radius:2px}
+.addbox{padding:8px 10px;border-top:1px solid var(--line);background:var(--panel2)}.addbox .t{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700;margin-bottom:6px}
+.addgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.addbtn{display:flex;width:100%;text-align:left;gap:6px;align-items:flex-start;padding:5px 7px;background:var(--panel);font-size:13px;white-space:normal;line-height:1.25}.addbtn i{font-style:normal;font-weight:700;color:var(--acc);width:16px}.addbtn small{display:block;color:var(--mut);font-weight:400;font-size:11.5px}
+/* zakladki */
+.tabs{display:flex;gap:2px;padding:0 8px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:flex-end;background:var(--panel2)}
+.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:9px 8px 7px;color:var(--mut);font-weight:600;font-size:13.5px}
+.tabs button.on{color:var(--fg);border-bottom-color:var(--acc)}.tabs button:hover{color:var(--fg)}
+.tabs .g{font-size:10px;color:var(--faint);padding:0 2px 11px 8px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.tabs .sp{flex:1}.tabs .qm{margin-bottom:5px}
+.helpbox{margin:0 0 10px;padding:9px 12px;border-radius:8px;background:var(--acc2);border-left:4px solid var(--acc);font-size:13px}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--line2);font-size:13px;vertical-align:top}
+td.m,th.m{font-family:var(--mono);font-size:12.5px}
+th{color:var(--mut);font-weight:600;position:sticky;top:0;background:var(--panel);z-index:1;font-size:12px}
+tr.chg td{background:var(--chg)}tr:hover td{background:var(--panel2)}
+.f{display:inline-block;margin:0 4px 3px 0;padding:0 6px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);cursor:help;font-family:var(--mono);font-size:12px}
+.box{margin:6px 0;padding:8px 11px;border-radius:8px;font-size:13px;border:1px solid transparent}.box.warn{background:var(--warnb);color:var(--warn);border-color:#f59e0b55}.box.bad{background:var(--badb);color:var(--bad);border-color:#ef444455}.box.ok{background:var(--okb);color:var(--ok)}.box.info{background:var(--panel2);border-color:var(--line2)}
+a.loc{color:var(--acc);cursor:pointer;font-family:var(--mono);text-decoration:underline;text-underline-offset:2px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}.kv>span:nth-child(odd){color:var(--mut)}
+.form{display:grid;grid-template-columns:120px 1fr;gap:6px 8px;align-items:center;font-size:13px}.form label{color:var(--mut)}.form input,.form select,.form textarea{width:100%;padding:4px 7px}
+.btns{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}
+pre{margin:0;white-space:pre-wrap;font-family:var(--mono);font-size:12.5px}
+.erc{border:1px solid var(--line2);border-left:4px solid var(--line);padding:7px 11px;margin-bottom:7px;background:var(--panel2);border-radius:0 8px 8px 0;cursor:pointer}
+.erc.error{border-left-color:var(--bad)}.erc.warn{border-left-color:#f59e0b}.erc.ok{border-left-color:var(--ok)}.erc b{display:block;margin-bottom:2px}.erc small{color:var(--mut)}
+.code{display:flex;height:100%;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.gut{font-family:var(--mono);font-size:12.5px;line-height:19px;padding:6px;color:var(--faint);text-align:right;background:var(--panel2);overflow:hidden;user-select:none;min-width:48px;white-space:pre}
+#editor{flex:1;border:0;border-radius:0;font-family:var(--mono);font-size:12.5px;line-height:19px;padding:6px 8px;white-space:pre;resize:none;tab-size:2;outline:none;overflow:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:4px}.legend i{display:inline-block;width:18px;height:4px;vertical-align:middle;margin-right:4px;border-radius:2px}
+#svg{width:100%;user-select:none;touch-action:none}#svg .el{cursor:grab}#svg text{font-family:"Segoe UI",system-ui,sans-serif}
+.seq text{font-size:11px;font-family:var(--mono)}
+.empty{color:var(--mut);padding:24px;text-align:center}
+.toast{position:fixed;bottom:220px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--panel);padding:8px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:80vw}.toast.on{opacity:.95}
+/* konsola */
+#dock{grid-column:1/4;height:200px}#dock.min{height:auto}#dock.min .dockbody{display:none}
+.docktabs{display:flex;gap:2px;align-items:center;background:var(--panel2);border-bottom:1px solid var(--line);padding:0 8px}
+.docktabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:7px 10px 5px;color:var(--mut);font-weight:600}.docktabs button.on{color:var(--fg);border-bottom-color:var(--acc)}
+.dockbody{flex:1;display:flex;min-height:0}
+#conOut{flex:1;overflow:auto;padding:6px 12px;font-family:var(--mono);font-size:12.5px;white-space:pre-wrap}
+#conOut .cmd{color:var(--acc);font-weight:600}#conOut .err{color:var(--bad)}#conOut .okl{color:var(--fg)}
+.conin{position:relative;display:flex;gap:6px;align-items:center;padding:6px 10px;border-top:1px solid var(--line2)}
+.conin input{flex:1;font-family:var(--mono)}.conin .pr{font-family:var(--mono);color:var(--acc);font-weight:700}
+#sugg{position:absolute;left:30px;bottom:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.18);max-height:220px;overflow:auto;min-width:420px;display:none;z-index:5}
+#sugg div{padding:4px 10px;cursor:pointer;display:flex;gap:12px;font-size:12.5px}#sugg div b{font-family:var(--mono);min-width:140px}#sugg div span{color:var(--mut)}#sugg div.on,#sugg div:hover{background:var(--acc2)}
+#usage{font-size:12px;color:var(--mut);padding:0 12px 6px 34px;font-family:var(--mono);min-height:18px}
+.modalbg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:30}
+.modal{background:var(--panel);border-radius:12px;border:1px solid var(--line);width:min(660px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 14px 50px rgba(0,0,0,.35)}
+.modal h2{font-size:14px;text-transform:none;letter-spacing:0;color:var(--fg);background:var(--panel)}.modal .body{padding:14px 16px}
+.modal .foot{display:flex;gap:6px;justify-content:flex-end;padding:10px 16px;border-top:1px solid var(--line)}
+.fs{border:1px solid var(--line);border-radius:8px;max-height:300px;overflow:auto;margin-top:6px}.fs div{padding:5px 10px;cursor:pointer;font-family:var(--mono);font-size:12.5px}.fs div:hover{background:var(--panel2)}.fs .d::before{content:"\1F4C1  "}.fs .fl{color:var(--faint)}.fs .fl.pick{color:var(--fg)}.fs div.sel{background:var(--acc2)}
+.welcome{max-width:800px;margin:10px auto}.welcome h1{font-size:24px;margin:0 0 4px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:12px 0}
+.card{border:1px solid var(--line);border-radius:10px;padding:13px;cursor:pointer;background:var(--panel)}.card:hover{border-color:var(--acc);box-shadow:0 2px 10px rgba(29,78,216,.12)}.card b{display:block;margin-bottom:4px}.card span{color:var(--mut);font-size:12.5px}
+.seg{display:flex;margin:4px 0 10px}.seg button{border-radius:0}.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0}.seg button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+details summary{cursor:pointer;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px;font-weight:700}
+.steps{counter-reset:s;padding:0;list-style:none}.steps li{counter-increment:s;margin:6px 0;padding-left:30px;position:relative}.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:21px;height:21px;border-radius:50%;background:var(--acc);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700}
+dl.gl dt{font-weight:700;margin-top:9px}dl.gl dd{margin:2px 0 0 0;color:var(--mut)}
+kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--panel2)}
+.vin{width:110px;font-family:var(--mono);padding:2px 6px}
+.star{cursor:pointer;font-size:16px;color:var(--faint);border:0;background:none;padding:0 4px}.star.on{color:#f59e0b}
+</style></head><body>
+<header>
+ <h1>can<span>sim</span></h1>
+ <div class="grp"><span class="lbl">Plik</span><button data-act="new" title="nowy, pusty schemat">Nowy</button><button data-act="open" title="otwórz zapisany schemat albo przykład">Otwórz</button><button data-act="save" title="zapisz schemat (Ctrl+S)">Zapisz</button><button data-act="saveas">Zapisz jako</button></div>
+ <div class="grp"><span class="lbl">Symulacja</span><button id="bRun" class="go" data-act="run" title="start / pauza (spacja)">▶ Start</button>
+  <button data-act="step" data-ms="1" title="przesuń czas o 1 ms">+1 ms</button><button data-act="step" data-ms="10">+10 ms</button><button data-act="step" data-ms="100">+100 ms</button>
+  <select id="speed" title="tempo względem czasu rzeczywistego"><option value="0.1">tempo 0,1×</option><option value="1" selected>tempo 1×</option><option value="5">tempo 5×</option><option value="20">tempo 20×</option></select>
+  <button data-act="reset" title="wszystkie płytki od nowa, czas = 0">⟲ Reset</button><button data-act="buildall" title="skompiluj kod wszystkich płytek i uruchom od nowa">Zbuduj wszystko</button></div>
+ <div class="grp"><span class="chip">czas <b id="cTime">0</b></span><span class="chip" title="jaki procent czasu magistrala jest zajęta ramkami">magistrala <b id="cLoad">0</b> %</span><span class="chip" id="cErc" data-act="tab" data-tab="ERC" style="cursor:pointer">ERC</span></div>
+ <span style="flex:1"></span>
+ <span id="sysName" data-act="rename" title="kliknij, aby zmienić nazwę" style="cursor:pointer;color:#d1d5db;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+ <button data-act="tab" data-tab="Pomoc" title="jak używać programu i słowniczek pojęć">Pomoc</button><button id="bTheme" data-act="theme" title="motyw: systemowy / jasny / ciemny">Motyw</button>
+</header>
+<div id="hint" class="info"><span class="ic">i</span><span id="hintTxt">Ładowanie…</span></div>
+<div id="app">
+ <section><h2>Elementy magistrali <span class="faint" id="partCount" style="text-transform:none"></span></h2><div class="body" id="parts"></div>
+  <div class="addbox"><div class="t">Dodaj do magistrali</div><div class="addgrid">
+   <button class="addbtn" data-act="add" data-kind="board" title="STM32H7 albo F4: Twój kod albo nowa z szablonu"><i>+</i><span>Płytka<small>z kodem C</small></span></button>
+   <button class="addbtn" data-act="add" data-kind="odrive" title="sterownik silnika, protokół CANSimple"><i>+</i><span>ODrive<small>sterownik silnika</small></span></button>
+   <button class="addbtn" data-act="add" data-kind="generic" title="np. komputer z adapterem USB-CAN albo analizator; wysyła ramki z konsoli"><i>+</i><span>Węzeł<small>PC, analizator</small></span></button>
+   <button class="addbtn" data-act="add" data-kind="terminator" title="rezystor 120 Ω między CANH a CANL na końcu kabla"><i>+</i><span>Terminator<small>120 Ω na końcu kabla</small></span></button></div></div>
+ </section>
+ <section><div class="tabs" id="tabs"></div><div class="body" id="view"></div></section>
+ <section><h2 id="inspTitle">Szczegóły</h2><div class="body" id="insp"></div></section>
+ <section id="dock"><div class="docktabs"><button data-act="dock" data-d="con" class="on" id="dkCon">Konsola komend</button><button data-act="dock" data-d="scn" id="dkScn">Scenariusz testowy</button>
+   <span style="flex:1"></span><span class="faint" style="font-size:12px">ręczne sterowanie symulacją · <kbd>Tab</kbd> podpowiada · <kbd>↑</kbd><kbd>↓</kbd> historia</span><button class="ghost sm" data-act="dockmin" id="bDockMin" title="zwiń / rozwiń">▾</button></div>
+  <div class="dockbody" id="dockCon" style="flex-direction:column"><div id="conOut"></div><div id="usage"></div>
+   <div class="conin"><span class="pr">&gt;</span><div id="sugg"></div><input id="conIn" autocomplete="off" spellcheck="false" placeholder="wpisz komendę, np. odrive 1 predkosc 2   (pomoc = lista komend)"><button class="pri" data-act="conrun">Wykonaj</button></div></div>
+  <div class="dockbody" id="dockScn" style="display:none;gap:10px;padding:8px 10px">
+   <div style="flex:1;display:flex;flex-direction:column;min-width:0"><textarea id="scnText" spellcheck="false" style="flex:1;font-family:var(--mono);font-size:12.5px;resize:none"></textarea></div>
+   <div style="width:44%;display:flex;flex-direction:column;min-width:0"><div class="btns" style="margin-top:0"><button class="pri" data-act="scnrun">▶ Uruchom scenariusz</button><select id="scnSel" title="zapisane scenariusze"><option value="">zapisane…</option></select><button data-act="scnsave">Zapisz w schemacie</button></div>
+    <div id="scnRes" style="flex:1;overflow:auto;font-family:var(--mono);font-size:12.5px" class="mut">Scenariusz to lista komend konsoli wykonywanych po kolei. <b>czekaj</b> przesuwa czas, <b>oczekuj</b> sprawdza wynik (OK / BŁĄD). Dobry do powtarzalnych testów przed wgraniem na sprzęt.</div></div></div>
+ </section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ms=ns=>(ns/1e6).toFixed(1);
+const post=(u,d)=>fetch(u,{method:'POST',headers:{'X-Cansim':'1','Content-Type':'application/json'},body:JSON.stringify(d||{})}).then(r=>r.json());
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2600)};
+let allRegs=false,fnState={fn:'',args:[]},lastCall='',S=null,sel=null,board=null,tab='Schemat',periph=null,prev={},curFile=null,showCalls=false,freeze=false,frozen=null,lastSeq=0,drag=null,fFilter='',vFilter='',codeBoard=null,pendingLine=0,cfgOpen=false,syms={},symKey='',mouseDown=false;
+const LEC=['brak błędu','Stuff (zła sekwencja bitów)','Form (zły format)','ACK (nikt nie potwierdził)','Bit1','Bit0','CRC (suma kontrolna)','bez zmian'];
+const TABS=[['Magistrala',['Schemat','Przepływ','Ramki','ERC']],['Płytka',['Zmienne','Rejestry','Pamięć CAN','Kod','Dziennik','Build']],['',['Narzędzia']]];
+const HELP={
+Schemat:'Fizyczny układ magistrali: kabel z przewodami <b>CANH</b> i <b>CANL</b>, wspólna masa <b>GND</b>, węzły i rezystory <b>120 Ω</b> na obu końcach. Przeciągnij element wzdłuż kabla, kliknij go, żeby po prawej zobaczyć szczegóły i opcje. Kolor ramki: <span class="ok">zielony</span> działa, <span class="warn">żółty</span> problem (Error Passive, INIT), <span class="bad">czerwony</span> odłączony. Kropki na kablu to ramki w drodze.',
+Przepływ:'Każdy wiersz to jedna ramka. Strzałka wychodzi od nadawcy. <b>Pełne kółko</b>: węzeł przyjął ramkę (przeszła przez jego filtr). <b>Puste kółko</b>: tylko potwierdził odbiór (ACK), ale jego filtr ją odrzucił. <b>x</b>: ramka zepsuta. Najnowsze na górze; „Zamroź” zatrzymuje podgląd, żeby spokojnie obejrzeć.',
+Ramki:'Lista ramek na magistrali z rozkodowaniem (ODrive i własne sygnały z pliku schematu). Eksport w formacie <b>candump</b> możesz porównać z logiem nagranym na prawdziwym sprzęcie (Linux: <code>candump -l can0</code>).',
+ERC:'ERC (Electrical Rules Check) sprawdza schemat i konfigurację według norm: terminację, masę, zasilanie transceiverów, zgodność prędkości, punkt próbkowania, długość kabla, tolerancję zegarów, unikalność ID, obciążenie. Kliknij pozycję, żeby wskazać element.',
+Zmienne:'Zmienne globalne z kodu wybranej płytki, jak w debuggerze: wartości odświeżają się na żywo, możesz je zmienić (wpisz i Enter) i dodać gwiazdką do obserwowanych. Zmienne <b>static</b> nie są widoczne z zewnątrz skompilowanego kodu.',
+Rejestry:'Rejestry sprzętowe peryferium (domyślnie kontrolera CAN) tak, jak widzi je Twój kod. Najedź na nazwę rejestru po opis, na pole bitowe po szczegóły. Żółte tło: wartość się zmieniła; niebieski pasek: kod używał rejestru od ostatniego odświeżenia.',
+'Pamięć CAN':'Wnętrze kontrolera CAN: dla FDCAN (H7) Message RAM z filtrami, buforami nadawczymi i odbiorczymi oraz FIFO; dla bxCAN (F4) trzy skrzynki nadawcze, dwie kolejki FIFO i banki filtrów.',
+Kod:'Kod źródłowy płytki. Po zmianie kliknij „Zapisz, zbuduj i podmień”: przebudowana zostanie tylko ta płytka, reszta symulacji działa dalej. Odnośniki plik:linia z innych zakładek otwierają tu właściwe miejsce.',
+Dziennik:'Co się działo w płytce: uwagi do kodu (z miejscem w kodzie), zmiany stanów kontrolera CAN, awarie, wywołania. Niżej: każdy odczyt i zapis rejestru kontrolera CAN.',
+Build:'Wynik kompilacji kodu płytki (gcc). Błędy z numerem linii są klikalne.',
+Narzędzia:'Kalkulator bit timingu (gotowa linia C) i kalkulator obciążenia magistrali.',
+Pomoc:'Krótki przewodnik i słowniczek pojęć.'};
+const REGDOC={CCCR:'Sterowanie: INIT=1 odłącza od magistrali, CCE=1 pozwala zmieniać rejestry chronione (tylko przy INIT=1), DAR wyłącza ponawianie.',
+NBTP:'Bit timing: NBRP preskaler, NTSEG1/NTSEG2 segmenty przed i po punkcie próbkowania, NSJW skok synchronizacji. Wpisuje się wartości minus 1.',
+IR:'Flagi przerwań; zapis 1 kasuje flagę. DRX ramka w buforze Rx, RF0N nowa w FIFO0, TC wysłano, EP/EW/BO stany błędów, PEA błąd protokołu.',
+IE:'Włączenie przerwań dla flag z IR.',ILS:'Wybór linii przerwania (0: IT0, 1: IT1) dla flag.',ILE:'Włączenie linii IT0/IT1 do NVIC.',
+PSR:'Stan protokołu: LEC kod ostatniego błędu (odczyt ustawia 7), EP/EW/BO, ACT aktywność.',ECR:'Liczniki błędów: TEC (nadawanie), REC (odbiór).',
+GFC:'Globalny filtr: ANFS co z ramkami niepasującymi do żadnego filtra (3 = odrzuć).',SIDFC:'Lista filtrów standardowych: LSS liczba, FLSSA adres w Message RAM.',
+TXBC:'Bufory nadawcze: NDTB liczba, TBSA adres.',RXBC:'Adres buforów odbiorczych.',RXF0C:'FIFO0: F0S rozmiar, F0SA adres, F0OM tryb nadpisywania.',
+RXF0S:'Stan FIFO0: F0FL zapełnienie, F0GI indeks do odczytu, F0PI indeks zapisu, F0F pełne, RF0L zgubiona ramka.',RXF0A:'Potwierdzenie odczytu elementu FIFO0.',
+TXBAR:'Zlecenie wysłania bufora.',TXBRP:'Bufory czekające na wysłanie.',TXBTO:'Bufory wysłane poprawnie.',TXBCR:'Anulowanie zlecenia.',
+NDAT1:'Nowe dane w buforach Rx 0..31; zapis 1 kasuje. Dopóki bit=1, bufor jest zablokowany.',
+MCR:'Sterowanie bxCAN: INRQ inicjalizacja, SLEEP uśpienie, ABOM auto-wyjście z Bus-Off, NART bez ponawiania, TXFP kolejność nadawania, RFLM blokada FIFO.',
+MSR:'Stan bxCAN: INAK w inicjalizacji, SLAK uśpiony, ERRI zmiana stanu błędów.',TSR:'Skrzynki Tx: TMEx pusta, RQCPx/TXOKx zakończone/poprawnie, CODE następna wolna, ABRQx anulowanie.',
+RF0R:'FIFO0: FMP0 liczba ramek (0..3), FULL0, FOVR0 przepełnienie, RFOM0=1 zwalnia ramkę.',RF1R:'FIFO1 jak RF0R.',IER:'Włączenie przerwań bxCAN.',ESR:'Błędy bxCAN: TEC, REC, LEC, BOFF/EPVF/EWGF.',
+BTR:'Bit timing bxCAN: BRP preskaler, TS1/TS2 segmenty, SJW (wartości minus 1).',FMR:'FINIT=1: konfiguracja filtrów, odbiór wyłączony. CAN2SB pierwszy bank CAN2.',
+FM1R:'Tryb banku: 0 maska, 1 lista ID.',FS1R:'Skala banku: 0 dwa filtry 16-bit, 1 jeden 32-bit.',FFA1R:'Przypisanie banku: 0 FIFO0, 1 FIFO1.',FA1R:'Aktywacja banków filtrów.'};
+const SCN_EXAMPLE=`# Przykładowy scenariusz: komendy wykonują się po kolei.
+# czekaj = przesuń czas, oczekuj = sprawdź (OK / BŁĄD).
+czekaj 200
+odrive * stan closed_loop
+odrive 1 predkosc 2.5
+czekaj 300
+stan
+# awaria: ODrive 2 traci zasilanie
+odrive 2 zasilanie off
+czekaj 500
+ramki 0x41 3
+odrive 2 zasilanie on
+czekaj 300
+`;
+
+// ------------------------------------------------------------ pomocnicze
+function setHTML(el,html){if(!el)return;if(el._h===html)return;el._h=html;el.innerHTML=html}
+function busy(el){if(!el)return false;const a=document.activeElement;if(a&&el.contains(a)&&['INPUT','SELECT','TEXTAREA'].includes(a.tagName))return true;
+ const s=window.getSelection();if(s&&!s.isCollapsed&&s.anchorNode&&el.contains(s.anchorNode))return true;return mouseDown&&el.matches(':hover')}
+document.addEventListener('mousedown',()=>mouseDown=true);document.addEventListener('mouseup',()=>setTimeout(()=>mouseDown=false,50));
+const part=id=>S&&S.parts.find(p=>p.id===id);
+const cfg=id=>S&&S.system.boards.concat(S.system.nodes).find(e=>e.id===id);
+function changed(k,v){const c=prev[k]!==undefined&&prev[k]!==v;prev[k]=v;return c}
+function tbl(h,rows,cls=''){return `<table class="${cls}"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${Array.isArray(rows)?rows.join(''):rows}</table>`}
+function locLink(loc,func){return loc?`<a class="loc" data-act="loc" data-loc="${esc(loc)}">${esc(loc)}${func?' ('+esc(func)+')':''}</a>`:''}
+const pl=(n,a,b,c)=>n===1?a:(n%10>=2&&n%10<=4&&!(n%100>=12&&n%100<=14))?b:c;
+const slug=n=>String(n||'').replace(/[^0-9A-Za-z\u0104-\u017c]+/g,'_').replace(/^_|_$/g,'');
+const STATE_TXT=p=>p.kind==='terminator'?'rezystor':p.kind!=='board'?(p.online===false?'wyłączony':p.bus_off?'BUS-OFF':p.passive?'Error Passive':'aktywny'):(!p.build_ok?'błąd kompilacji':p.bus_off?'BUS-OFF':p.init?'INIT (odłączony)':p.passive?'Error Passive':'aktywna');
+const STATE_CLS=p=>p.kind==='terminator'?'term':(p.kind==='board'&&!p.build_ok)||p.bus_off||(p.online===false&&p.kind!=='board')?'bad':p.init||p.passive||p.error?'warn':'ok';
+function selectEl(id){if(sel!==id){lastCall='';fnState={fn:'',args:[]}}sel=id;const p=part(id);if(p&&p.kind==='board'&&board!==id){board=id;periph=null;prev={}}renderAll(true)}
+
+// ------------------------------------------------------------ akcje (jeden wspolny handler)
+const ACT={
+ run:()=>post('/api/run',{run:!S.running,speed:+$('speed').value}).then(poll),
+ step:b=>post('/api/step',{ms:+b.dataset.ms}).then(poll),
+ reset:()=>post('/api/reset').then(()=>{lastSeq=0;poll();toast('Reset: wszystkie płytki od początku')}),
+ buildall:()=>{toast('Kompilacja wszystkich płytek…');post('/api/build').then(()=>{lastSeq=0;poll().then(()=>renderAll(true));toast('Zbudowano')})},
+ new:async()=>{if(!confirm('Nowy pusty schemat? Niezapisane zmiany przepadną.'))return;await post('/api/system/open',{path:''});sel=null;board=null;lastSeq=0;tab='Schemat';await poll();renderAll(true)},
+ open:async()=>{const p=await pick({mode:'file',title:'Otwórz schemat (cansim_system.json) albo projekt płytki',exts:['.json']});if(p)openSys(p)},
+ save:async()=>{if(!S.sys_path)return ACT.saveas();const r=await post('/api/system/save');toast('Zapisano: '+r.msg)},
+ saveas:async()=>{const p=await pick({mode:'save',title:'Zapisz schemat jako',name:'cansim_system.json'});if(!p)return;const r=await post('/api/system/save',{path:p});toast('Zapisano: '+r.msg);poll()},
+ rename:()=>{const n=prompt('Nazwa schematu:',S.name||'');if(n!==null)post('/api/system/bus',{name:n}).then(poll)},
+ theme:()=>{const o=[undefined,'light','dark'];const c=document.documentElement.dataset.theme;const n=o[(o.indexOf(c)+1)%3];if(n)document.documentElement.dataset.theme=n;else delete document.documentElement.dataset.theme;try{n?localStorage.setItem('cansim_theme',n):localStorage.removeItem('cansim_theme')}catch(e){}themeLbl();renderAll(true)},
+ tab:b=>{tab=b.dataset.tab;renderAll(true)},
+ help:()=>{const k='cansim_help_'+tab;localStorage.setItem(k,localStorage.getItem(k)==='0'?'1':'0');renderAll(true)},
+ add:async b=>{const k=b.dataset.kind;if(k==='board')return addBoardDlg();let d={kind:k};if(k==='generic'){const n=prompt('Nazwa węzła (np. PC, Analizator):','PC');if(n===null)return;d.name=n}
+  const r=await post('/api/system/add',d);toast(r.msg==='ok'?'Dodano':r.msg);await poll();const all=S.system.nodes;if(r.msg==='ok'&&all.length){sel=all[all.length-1].id}renderAll(true)},
+ part:b=>selectEl(b.dataset.id),
+ loc:b=>{const [f,ln]=b.dataset.loc.split(/:(?=\d+$)/);openFile(f,+ln)},
+ inj:b=>post('/api/inject',{target:b.dataset.t,what:b.dataset.w,value:b.dataset.v==='true'?true:b.dataset.v==='false'?false:isNaN(b.dataset.v)?b.dataset.v:+b.dataset.v}).then(r=>{toast(r.msg==='ok'?'Wykonano':r.msg);poll()}),
+ del:b=>{if(confirm('Usunąć element ze schematu?'))post('/api/system/remove',{id:b.dataset.id}).then(()=>{sel=null;poll().then(()=>renderAll(true))})},
+ boardtab:b=>{board=b.dataset.id;tab=b.dataset.tab;periph=null;renderAll(true)},
+ buildone:b=>{toast('Kompilacja płytki…');post('/api/build',{board:b.dataset.id}).then(()=>poll().then(()=>{renderAll(true);toast(S.board&&S.board.build_ok?'Zbudowano i podmieniono płytkę':'Błąd kompilacji: zakładka Build')}))},
+ ercsel:b=>{const id=b.dataset.ids.split(',')[0];if(id)selectEl(id)},
+ star:async b=>{const n=b.dataset.name;if(b.classList.contains('on'))await post('/api/watch/remove',{board,name:n});else await post('/api/cmd',{line:`obserwuj ${slug(part(board).name)} ${n}`});symKey='';poll()},
+ dock:b=>{const d=b.dataset.d;$('dockCon').style.display=d==='con'?'flex':'none';$('dockScn').style.display=d==='scn'?'flex':'none';$('dkCon').classList.toggle('on',d==='con');$('dkScn').classList.toggle('on',d==='scn');$('dock').classList.remove('min')},
+ dockmin:()=>{$('dock').classList.toggle('min');$('bDockMin').textContent=$('dock').classList.contains('min')?'▴':'▾'},
+ conrun:()=>conRun(),scnrun:()=>scnRun(),
+ call:b=>doCall(),freeze:()=>{freeze=!freeze;frozen=freeze?S.frames.slice():null;renderAll(true)},
+ fetchhdr:async()=>{toast('Pobieram nagłówki ST, to może potrwać kilka minut…');const r=await post('/api/headers/fetch');toast(r.msg);await poll();renderAll(true)},
+ ex:b=>openSys(b.dataset.path),
+ wfolder:()=>addBoardDlg('folder'),wtempl:()=>addBoardDlg('template'),
+ cmdins:b=>{const i=$('conIn');i.value=b.dataset.cmd;i.focus();if($('dock').classList.contains('min'))ACT.dockmin();ACT.dock({dataset:{d:'con'}});suggest()},
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b)}});
+document.addEventListener('keydown',e=>{const t=document.activeElement.tagName;if(e.code==='Space'&&!['INPUT','TEXTAREA','SELECT','BUTTON'].includes(t)){e.preventDefault();ACT.run()}
+ if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();ACT.save()}});
+$('speed').onchange=()=>post('/api/run',{run:S.running,speed:+$('speed').value});
+function themeLbl(){const t=document.documentElement.dataset.theme;$('bTheme').textContent=t==='light'?'Motyw: jasny':t==='dark'?'Motyw: ciemny':'Motyw: system'}
+async function openSys(p){toast('Otwieram i kompiluję…');const r=await post('/api/system/open',{path:p});if(r.msg!=='ok'){toast(r.msg);return}sel=null;board=null;lastSeq=0;tab='Schemat';syms={};await poll();renderAll(true);toast('Otwarto')}
+
+// ------------------------------------------------------------ okna dialogowe
+function modal(title,html,buttons){return new Promise(res=>{const bg=document.createElement('div');bg.className='modalbg';
+ bg.innerHTML=`<div class="modal"><h2>${esc(title)}</h2><div class="body">${html}</div><div class="foot">${buttons.map((b,i)=>`<button data-i="${i}" class="${b.pri?'pri':''}">${esc(b.label)}</button>`).join('')}</div></div>`;
+ document.body.appendChild(bg);const close=v=>{bg.remove();res(v)};bg.querySelectorAll('.foot button').forEach(btn=>btn.onclick=()=>{const b=buttons[+btn.dataset.i];const v=b.value?b.value(bg):null;if(v===false)return;close(v)});
+ bg.onclick=e=>{if(e.target===bg)close(null)};bg._close=close;bg.addEventListener('keydown',e=>{if(e.key==='Escape')close(null)});const f=bg.querySelector('input,select');if(f)f.focus()})}
+async function pick(o){let cur=o.start||localStorage.getItem('cansim_dir')||'';let chosen='';
+ const html=`<div style="display:flex;gap:4px;flex-wrap:wrap" id="fsQuick"></div><div style="display:flex;gap:4px;margin-top:6px"><input id="fsPath" style="flex:1;font-family:var(--mono)"><button id="fsUp">⬆ W górę</button></div><div class="fs" id="fsList"></div>
+  ${o.mode==='save'?`<div class="form" style="margin-top:8px"><label>nazwa pliku</label><input id="fsName" value="${esc(o.name||'')}"></div>`:''}<div class="mut" style="margin-top:6px;font-size:12.5px">${o.mode==='dir'?'Wejdź do folderu (kliknij jego nazwę) i naciśnij „Wybierz ten folder”.':o.mode==='file'?'Kliknij plik i „Otwórz” (albo kliknij dwa razy).':'Wybierz folder i wpisz nazwę pliku.'}</div>`;
+ const p=modal(o.title,html,[{label:'Anuluj'},{label:o.mode==='dir'?'Wybierz ten folder':o.mode==='save'?'Zapisz tutaj':'Otwórz',pri:1,value:bg=>{const dir=bg.querySelector('#fsPath').value;
+   if(o.mode==='dir')return dir;if(o.mode==='save'){const n=bg.querySelector('#fsName').value.trim();if(!n)return false;return dir.replace(/[\\/]$/,'')+(dir.includes('\\')?'\\':'/')+n}if(!chosen){toast('Najpierw kliknij plik');return false}return chosen}}]);
+ const bg=document.querySelector('.modalbg:last-child');
+ async function go(path){const r=await fetch('/api/fs?path='+encodeURIComponent(path)).then(r=>r.json());cur=r.path;localStorage.setItem('cansim_dir',cur);chosen='';bg.querySelector('#fsPath').value=r.path;
+  const ok=f=>!o.exts||o.exts.some(x=>f.toLowerCase().endsWith(x));
+  bg.querySelector('#fsList').innerHTML=r.dirs.map(d=>`<div class="d" data-d="${esc(d)}">${esc(d)}</div>`).join('')+r.files.map(f=>`<div class="fl ${ok(f)?'pick':''}" data-f="${esc(f)}">${esc(f)}</div>`).join('')||'<div class="faint">pusty folder</div>';
+  bg.querySelector('#fsQuick').innerHTML=[['Folder domowy',r.home]].concat(r.examples?[['Przykłady',r.examples]]:[]).concat(r.roots.map(x=>[x,x])).map(([l,pth])=>`<button class="sm" data-q="${esc(pth)}">${esc(l)}</button>`).join('');bg._up=r.parent}
+ bg.addEventListener('click',e=>{const t=e.target;const sep=cur.includes('\\')?'\\':'/';const j=n=>cur.replace(/[\\/]$/,'')+sep+n;
+  if(t.dataset.d!==undefined)go(j(t.dataset.d));else if(t.dataset.q)go(t.dataset.q);else if(t.dataset.f!==undefined){if(o.mode==='save'){bg.querySelector('#fsName').value=t.dataset.f;return}bg.querySelectorAll('.fs div').forEach(x=>x.classList.remove('sel'));t.classList.add('sel');chosen=j(t.dataset.f)}});
+ bg.addEventListener('dblclick',e=>{if(e.target.dataset.f!==undefined&&o.mode==='file')bg._close(chosen)});
+ bg.querySelector('#fsUp').onclick=()=>go(bg._up);bg.querySelector('#fsPath').onchange=e=>go(e.target.value);go(cur);return p}
+async function addBoardDlg(start){let mode=start||'folder';
+ const html=`<div class="seg" id="abMode"><button data-m="folder">Mój kod (folder)</button><button data-m="template">Nowa płytka od zera</button><button data-m="json">Plik projektu .json</button></div>
+ <div id="abDesc" class="box info" style="margin-bottom:10px"></div><div class="form"><label>mikrokontroler</label><select id="abFam"><option value="h7">STM32H7 (FDCAN), np. H743</option><option value="f4">STM32F4 (bxCAN), np. F407</option></select>
+ <label>nazwa płytki</label><input id="abName" placeholder="np. Sterownik H743"><label id="abPL">folder</label><div style="display:flex;gap:4px"><input id="abPath" style="flex:1;font-family:var(--mono)"><button id="abPick">Wybierz…</button></div></div>`;
+ const desc={folder:'Wskaż folder z Twoimi plikami .c i .h (np. repo płytki). Pliki źródłowe i katalogi nagłówków wykryją się same; zmienisz je potem w „Ustawieniach kompilacji płytki”. Twoje pliki nie są modyfikowane.',
+  template:'Powstanie nowy folder z działającym przykładowym main.c (CAN 250 kbit/s, sterowanie ODrive), od którego zaczniesz pisać swój kod.',json:'Gotowy plik cansim_project.json (np. z folderu examples).'};
+ const pr=modal('Dodaj płytkę z kodem',html,[{label:'Anuluj'},{label:'Dodaj i zbuduj',pri:1,value:bg=>{const path=bg.querySelector('#abPath').value.trim();if(!path){toast('Wskaż folder albo plik');return false}return {path,name:bg.querySelector('#abName').value.trim(),fam:bg.querySelector('#abFam').value,mode}}}]);
+ const bg=document.querySelector('.modalbg:last-child');const upd=()=>{bg.querySelectorAll('#abMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));bg.querySelector('#abDesc').textContent=desc[mode];bg.querySelector('#abPL').textContent=mode==='json'?'plik':mode==='template'?'nowy folder':'folder z kodem';bg.querySelector('#abFam').disabled=mode==='json'};upd();
+ bg.querySelector('#abMode').onclick=e=>{if(e.target.dataset.m){mode=e.target.dataset.m;upd()}};
+ bg.querySelector('#abPick').onclick=async()=>{const p=await pick(mode==='json'?{mode:'file',title:'Wybierz cansim_project.json',exts:['.json']}:mode==='template'?{mode:'save',title:'Gdzie utworzyć folder nowej płytki',name:bg.querySelector('#abName').value.trim().replace(/\W+/g,'_')||'moja_plytka'}:{mode:'dir',title:'Wybierz folder z kodem płytki'});if(p)bg.querySelector('#abPath').value=p};
+ const v=await pr;if(!v)return;toast('Kompilacja płytki…');const r=await post('/api/system/add',{kind:v.mode==='json'?'board':v.mode==='template'?'board_template':'board_folder',project:v.path,name:v.name,family:v.fam});
+ toast(r.msg==='ok'?'Płytka dodana':r.msg);await poll();const nb=S.system.boards[S.system.boards.length-1];if(nb&&r.msg==='ok'){sel=nb.id;board=nb.id}renderAll(true)}
+
+// ------------------------------------------------------------ zakladki
+function drawTabs(){const hk=localStorage.getItem('cansim_help_'+tab)!=='0';
+ setHTML($('tabs'),TABS.map(([g,ts])=>`<span class="g">${g}</span>`+ts.map(t=>`<button data-act="tab" data-tab="${t}" class="${t===tab?'on':''}">${t}</button>`).join('')).join('')+`<span class="sp"></span><button class="sm qm ${hk?'pri':''}" data-act="help" title="pokaż / ukryj objaśnienie tej zakładki">?</button>`)}
+function helpBox(){return localStorage.getItem('cansim_help_'+tab)!=='0'&&HELP[tab]?`<div class="helpbox">${HELP[tab]}</div>`:''}
+
+// ------------------------------------------------------------ lista elementow
+function drawParts(){const ps=S.parts.slice().sort((a,b)=>(cfg(a.id)?.pos_m??0)-(cfg(b.id)?.pos_m??0));$('partCount').textContent=ps.length?`(${ps.length})`:'';
+ setHTML($('parts'),ps.length?ps.map(p=>{const sub=p.kind==='board'?`${p.mcu||'płytka'} · ${STATE_TXT(p)}`:p.kind==='odrive'?`ODrive id ${p.node_id} · ${p.online===false?'wyłączony':p.state_name||''}`:p.kind==='generic'?`węzeł · ${STATE_TXT(p)}`:`na ${cfg(p.id)?.pos_m??0} m kabla`;
+  return `<div class="part ${p.id===sel?'sel':''}" data-act="part" data-id="${p.id}"><span class="dot ${STATE_CLS(p)}"></span><span class="nm"><b>${esc(p.name)}</b><small>${esc(sub)}</small></span>${p.warn_count?`<span class="chip warn" title="uwagi do kodu" style="background:var(--warnb);color:var(--warn)">${p.warn_count}</span>`:''}</div>`}).join(''):'<div class="faint" style="padding:6px">Pusto. Dodaj elementy przyciskami poniżej.</div>')}
+
+// ------------------------------------------------------------ schemat
+const X0=80,X1=920,YH=190,YL=212,YG=270;
+function busLen(){return Math.max(S.system.bus.length_m,...S.system.boards.concat(S.system.nodes).map(e=>e.pos_m),0.1)}
+const xOf=m=>X0+(X1-X0)*m/busLen();
+function layout(){const els=S.system.boards.concat(S.system.nodes).slice().sort((a,b)=>a.pos_m-b.pos_m);const rows=[-1e9,-1e9];const out={};
+ els.forEach(e=>{const x=xOf(e.pos_m);if(e.type==='terminator'){out[e.id]={x,row:0};return}const r=x-rows[0]>130?0:(x-rows[1]>130?1:0);rows[r]=x;out[e.id]={x,row:r}});return out}
+function resistor(x,y1,y2,lbl){const m=(y1+y2)/2;return `<path d="M${x} ${y1} V${m-9} l5 2 l-10 3 l10 3 l-10 3 l5 2 V${y2}" fill="none" stroke="var(--fg)" stroke-width="1.5"/><text x="${x+8}" y="${m+4}" font-size="10.5" fill="var(--mut)">${lbl}</text>`}
+function drawSchem(){const lay=layout();const ercIds={};(S.erc||[]).forEach(i=>{if(i.level!=='ok')i.ids.forEach(id=>{ercIds[id]=ercIds[id]==='error'?'error':i.level})});
+ let s=`<text x="10" y="${YH+4}" font-size="12" fill="var(--canh)" font-weight="700">CANH</text><text x="10" y="${YL+4}" font-size="12" fill="var(--canl)" font-weight="700">CANL</text><text x="10" y="${YG+4}" font-size="12" fill="var(--gnd)" font-weight="700">GND</text>`;
+ s+=`<line x1="${X0}" x2="${X1}" y1="${YH}" y2="${YH}" stroke="var(--canh)" stroke-width="3.5"/><line x1="${X0}" x2="${X1}" y1="${YL}" y2="${YL}" stroke="var(--canl)" stroke-width="3.5"/><line x1="${X0}" x2="${X1}" y1="${YG}" y2="${YG}" stroke="var(--gnd)" stroke-width="1.8" stroke-dasharray="6 4"/>`;
+ const L=busLen(),stp=L>6?1:L>2?0.5:0.25;for(let m=0;m<=L+1e-9;m+=stp){s+=`<line x1="${xOf(m)}" x2="${xOf(m)}" y1="${YG+8}" y2="${YG+13}" stroke="var(--faint)"/><text x="${xOf(m)}" y="${YG+26}" font-size="10.5" text-anchor="middle" fill="var(--faint)">${+m.toFixed(2)} m</text>`}
+ S.system.boards.concat(S.system.nodes).forEach(e=>{const p=part(e.id)||{};const x=lay[e.id].x;
+  if(e.type==='terminator'){s+=`<g class="el" data-id="${e.id}">${resistor(x,YH,YL,'120 Ω')}<rect x="${x-18}" y="${YH-16}" width="58" height="${YL-YH+32}" fill="transparent" stroke="${e.id===sel?'var(--acc)':'none'}" stroke-width="2" rx="5"/></g>`;return}
+  const by=lay[e.id].row?16:90,bh=64,bw=128,bx=x-bw/2;const cls=STATE_CLS(p);const col=cls==='ok'?'var(--ok)':cls==='warn'?'#f59e0b':cls==='bad'?'var(--bad)':'var(--faint)';
+  s+=`<g class="el" data-id="${e.id}"><line x1="${x-6}" x2="${x-6}" y1="${by+bh}" y2="${YH}" stroke="var(--canh)" stroke-width="1.8"/><circle cx="${x-6}" cy="${YH}" r="3.5" fill="var(--canh)"/><line x1="${x+6}" x2="${x+6}" y1="${by+bh}" y2="${YL}" stroke="var(--canl)" stroke-width="1.8"/><circle cx="${x+6}" cy="${YL}" r="3.5" fill="var(--canl)"/>`;
+  s+=e.gnd!==false?`<path d="M${x+22} ${by+bh} V${YG}" stroke="var(--gnd)" stroke-width="1.3" stroke-dasharray="3 3" fill="none"/><circle cx="${x+22}" cy="${YG}" r="3" fill="var(--gnd)"/>`:`<text x="${x+16}" y="${YG-8}" font-size="14" fill="var(--bad)" font-weight="700">✕</text>`;
+  if(e.termination){const rx=x>(X0+X1)/2?x-32:x+32;s+=resistor(rx,YH,YL,'120 Ω')}
+  s+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="8" fill="var(--panel)" stroke="${e.id===sel?'var(--acc)':col}" stroke-width="${e.id===sel?3:2}"/><rect x="${bx}" y="${by}" width="6" height="${bh}" rx="3" fill="${col}"/>`;
+  s+=`<text x="${x+3}" y="${by+17}" font-size="12.5" font-weight="700" text-anchor="middle" fill="var(--fg)">${esc((p.name||e.name||'').slice(0,17))}</text>`;
+  const l2=p.kind==='board'?`${p.mcu||'MCU'} · ${p.can_name||''}`:p.kind==='odrive'?`ODrive id ${p.node_id??e.node_id??'?'}`:'węzeł generyczny';
+  s+=`<text x="${x+3}" y="${by+31}" font-size="10" text-anchor="middle" fill="var(--mut)">${esc(l2.slice(0,24))}</text>`;
+  const l3=p.kind==='board'?`${STATE_TXT(p)} · TEC ${p.tec??'-'}`:p.kind==='odrive'?`${p.online===false?'wyłączony':p.state_name||''} · v=${p.vel??'-'}`:`${STATE_TXT(p)} · tx ${p.sent??0}`;
+  s+=`<text x="${x+3}" y="${by+46}" font-size="10.5" font-weight="600" text-anchor="middle" fill="${col}">${esc(l3.slice(0,24))}</text><text x="${x+3}" y="${by+59}" font-size="9.5" text-anchor="middle" fill="var(--faint)">${esc(e.transceiver)}${p.bitrate?' · '+p.bitrate/1000+' kbit/s':''}</text>`;
+  if(ercIds[e.id])s+=`<circle cx="${bx+bw-3}" cy="${by+3}" r="9" fill="${ercIds[e.id]==='error'?'var(--bad)':'#f59e0b'}"/><text x="${bx+bw-3}" y="${by+7.5}" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">!</text>`;
+  s+=`</g>`});
+ const nt=S.system.boards.concat(S.system.nodes).filter(e=>e.termination||e.type==='terminator').length;
+ s+=`<text x="${X1}" y="${YG+44}" font-size="12" text-anchor="end" font-weight="600" fill="${nt===2?'var(--ok)':'var(--bad)'}">Między CANH a CANL (bez zasilania): ${nt?Math.round(120/nt)+' Ω':'brak terminacji'} · rezystorów 120 Ω: ${nt} ${nt===2?'✓':'(powinny być 2)'}</text><g id="anim"></g>`;return s}
+function renderWelcome(v){const hd=S.headers||{};const miss=Object.keys(hd).filter(k=>!hd[k]);
+ setHTML(v,`<div class="welcome"><h1>Witaj w cansim</h1><div class="mut">Symulator magistrali CAN dla STM32. Układasz magistralę z płytek z Twoim kodem C, sterowników ODrive i innych węzłów, uruchamiasz i obserwujesz, co się dzieje, zanim cokolwiek wgrasz na sprzęt.</div>
+ ${miss.length?`<div class="box warn" style="margin-top:12px"><b>Brakuje oficjalnych nagłówków ST</b> dla ${miss.join(', ').toUpperCase()}: bez nich płytki się nie skompilują. <button class="pri sm" data-act="fetchhdr">Pobierz nagłówki ST</button> <span>(internet, ok. 70 MB; albo plik pobierz_naglowki_st.bat)</span></div>`:''}
+ <h3>Jak zacząć</h3><ol class="steps"><li><b>Dodaj płytkę</b> z Twoim kodem (folder z plikami .c/.h) albo utwórz nową od zera.</li><li><b>Dodaj resztę magistrali</b> przyciskami po lewej: ODrive, PC (węzeł), terminatory 120 Ω na końcach.</li><li>Naciśnij <b>▶ Start</b> albo <b>+100 ms</b> i obserwuj zakładki. Na dole jest <b>konsola</b>: wpisz <kbd>pomoc</kbd>.</li></ol>
+ <div class="cards"><div class="card" data-act="wfolder"><b>+ Płytka z moim kodem</b><span>Wskaż folder z plikami .c/.h, np. repozytorium Twojej płytki.</span></div>
+ <div class="card" data-act="wtempl"><b>+ Nowa płytka od zera</b><span>Folder z przykładowym main.c dla H7 albo F4.</span></div>
+ <div class="card" data-act="open"><b>Otwórz schemat</b><span>Zapisany wcześniej plik cansim_system.json.</span></div></div>
+ <div id="wExBox" style="display:none"><h3>Przykłady</h3><div class="cards" id="wEx"></div></div></div>`);
+ fetch('/api/examples').then(r=>r.json()).then(ex=>{const w=$('wEx');if(w&&ex.length)$('wExBox').style.display='';if(w)w.innerHTML=ex.map(e=>`<div class="card" data-act="ex" data-path="${esc(e.path)}"><b>${esc(e.name)}</b><span>${esc(e.path.split(/[\\/]/).slice(-2).join('/'))}</span></div>`).join('')})}
+function renderSchem(v,full){
+ if(!S.system.boards.length&&!S.system.nodes.length){if(full||!$('wEx'))renderWelcome(v);return}
+ if(full||!$('svg')){v._h='';v.innerHTML=helpBox()+`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px"><span style="flex:1"></span><label class="mut">długość kabla <input id="busL" type="number" step="0.1" min="0.1" style="width:80px" value="${S.system.bus.length_m}"> m</label></div>
+  <svg id="svg" viewBox="0 0 1000 330"></svg><div class="legend"><span><i style="background:var(--canh)"></i>CANH</span><span><i style="background:var(--canl)"></i>CANL</span><span><i style="background:var(--gnd)"></i>GND (wspólna masa)</span><span>zygzak = rezystor 120 Ω</span><span><i style="background:var(--ok)"></i>działa</span><span><i style="background:#f59e0b"></i>Error Passive / INIT</span><span><i style="background:var(--bad)"></i>Bus-Off / wyłączony</span><span>! = uwaga ERC</span></div>
+  <h3>Najważniejsze uwagi ERC</h3><div id="ercMini"></div>`;
+  $('busL').onchange=e=>post('/api/system/bus',{length_m:+e.target.value}).then(poll);const svg=$('svg');
+  svg.onpointerdown=e=>{const g=e.target.closest('.el');if(!g)return;const id=g.dataset.id;selectEl(id);const pt=svgPt(e);drag={id,x0:pt.x,m0:cfg(id).pos_m,moved:false};svg.setPointerCapture(e.pointerId)};
+  svg.onpointermove=e=>{if(!drag)return;const pt=svgPt(e);const c=cfg(drag.id);const nv=Math.max(0,Math.round((drag.m0+(pt.x-drag.x0)/(X1-X0)*busLen())*20)/20);if(nv!==c.pos_m){c.pos_m=nv;drag.moved=true;$('svg').innerHTML=drawSchem()}};
+  svg.onpointerup=()=>{if(drag&&drag.moved)post('/api/system/patch',{id:drag.id,changes:{pos_m:cfg(drag.id).pos_m}}).then(poll);drag=null}}
+ if(!drag){const g=$('anim');const keep=g?g.innerHTML:'';$('svg').innerHTML=drawSchem();if(keep)$('anim').innerHTML=keep}
+ const bad=(S.erc||[]).filter(i=>i.level!=='ok');setHTML($('ercMini'),bad.length?bad.slice(0,4).map(ercHtml).join(''):'<div class="box ok">ERC nie znalazł problemów.</div>');animateFrames()}
+function svgPt(e){const r=$('svg').getBoundingClientRect();return {x:(e.clientX-r.left)*1000/r.width,y:(e.clientY-r.top)*330/r.height}}
+function animateFrames(){const g=$('anim');if(!g||!S.frames.length)return;const lay=layout();const byName={};S.parts.forEach(p=>byName[p.name]=p.id);
+ const last=S.frames[S.frames.length-1].seq;if(lastSeq===0||last<lastSeq){lastSeq=last;return}const fresh=S.frames.filter(f=>f.seq>lastSeq).slice(-6);lastSeq=last;if(!fresh.length)return;let h='';
+ fresh.forEach((f,i)=>{const id=byName[f.src];if(!id||!lay[id])return;const x=lay[id].x;const c=f.status==='ok'?'var(--ok)':'var(--bad)';const d=(0.4+i*0.05).toFixed(2);
+  [X0,X1].forEach(xe=>{h+=`<circle cx="${x}" cy="${YH}" r="5.5" fill="${c}"><animate attributeName="cx" from="${x}" to="${xe}" dur="${d}s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" dur="${d}s" fill="freeze"/></circle>`});
+  f.acc.forEach(n=>{const r=byName[n];if(r&&lay[r]){const L=lay[r];h+=`<circle cx="${L.x}" cy="${L.row?16:90}" r="4" fill="var(--ok)"><animate attributeName="r" from="4" to="15" dur=".55s" fill="freeze"/><animate attributeName="opacity" from="1" to="0" dur=".55s" fill="freeze"/></circle>`}})});g.innerHTML=h}
+
+// ------------------------------------------------------------ przeplyw
+function filterFrames(fr){const q=fFilter.trim().toLowerCase();if(!q)return fr;return fr.filter(f=>f.id.toLowerCase()===q.replace(/^0x/,'')||f.src.toLowerCase().includes(q)||(f.dec||'').toLowerCase().includes(q)||f.status.includes(q))}
+function renderSeq(v,full){
+ if(full||!$('seqWrap')){v._h='';v.innerHTML=helpBox()+`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><button data-act="freeze" class="${freeze?'pri':''}">${freeze?'▶ Wznów podgląd':'❚❚ Zamroź podgląd'}</button><input id="seqF" placeholder="filtr: ID (np. 0x2D), nadawca albo tekst" style="width:280px" value="${esc(fFilter)}"></div><div id="seqWrap"></div>`;
+  $('seqF').oninput=e=>{fFilter=e.target.value;renderSeq(v)}}
+ if(busy($('seqWrap')))return;
+ const parts=S.parts.filter(p=>p.kind!=='terminator').sort((a,b)=>(cfg(a.id)?.pos_m??0)-(cfg(b.id)?.pos_m??0));
+ const fr=filterFrames(freeze?frozen:S.frames).slice(-40).reverse();const W=Math.max(760,150*parts.length+240),cx=i=>240+i*((W-270)/Math.max(parts.length-1,1)),rowH=26,top=48;
+ let s=`<svg class="seq" viewBox="0 0 ${W} ${top+rowH*fr.length+10}" width="100%">`;
+ parts.forEach((p,i)=>{s+=`<line x1="${cx(i)}" x2="${cx(i)}" y1="36" y2="${top+rowH*fr.length}" stroke="var(--line)" stroke-width="1.5"/><text x="${cx(i)}" y="15" text-anchor="middle" font-weight="700" fill="var(--fg)" style="font-family:'Segoe UI',system-ui;font-size:12px">${esc(p.name.slice(0,18))}</text><text x="${cx(i)}" y="29" text-anchor="middle" fill="var(--faint)">${p.kind==='board'?esc(p.can_name||''):p.kind==='generic'?'węzeł':p.kind}</text>`});
+ const idx={};parts.forEach((p,i)=>idx[p.name]=i);
+ fr.forEach((f,r)=>{const y=top+r*rowH+14;const si=idx[f.src];if(si===undefined)return;const ok=f.status==='ok';const col=ok?'var(--acc)':'var(--bad)';const tg=parts.map((p,i)=>i).filter(i=>i!==si);const xs=tg.map(cx);
+  s+=`<g><title>${esc(f.src)} → 0x${f.id} [${f.data}] ${esc(f.dec)} | ${f.status}${f.reason?' ('+esc(f.reason)+')':''}\nprzyjęli: ${esc(f.acc.join(', ')||'-')}\ntylko ACK: ${esc(f.ack.join(', ')||'-')}</title><rect x="0" y="${y-12}" width="${W}" height="${rowH-2}" fill="transparent"/>`;
+  s+=`<text x="4" y="${y+4}" fill="var(--faint)">${ms(f.t)}</text><text x="70" y="${y+4}" fill="${col}" font-weight="700">0x${f.id}</text><text x="124" y="${y+4}" fill="var(--mut)">${esc(((f.dec||'').replace(/^node \d+ /,'').split(':')[0]||f.data).slice(0,15))}</text>`;
+  s+=`<line x1="${Math.min(cx(si),...xs)}" x2="${Math.max(cx(si),...xs)}" y1="${y}" y2="${y}" stroke="${col}" stroke-width="1.5" ${ok?'':'stroke-dasharray="4 3"'}/><circle cx="${cx(si)}" cy="${y}" r="6" fill="${col}"/>`;
+  tg.forEach(i=>{const n=parts[i].name,x=cx(i);s+=!ok?`<text x="${x}" y="${y+4}" text-anchor="middle" fill="var(--bad)" font-weight="700">x</text>`:f.acc.includes(n)?`<circle cx="${x}" cy="${y}" r="5.5" fill="var(--ok)"/>`:f.ack.includes(n)?`<circle cx="${x}" cy="${y}" r="5" fill="var(--panel)" stroke="var(--mut)" stroke-width="1.5"/>`:''});s+='</g>'});
+ setHTML($('seqWrap'),fr.length?s+'</svg>':'<div class="empty">Brak ramek. Uruchom symulację: ▶ Start albo +100 ms.</div>')}
+
+// ------------------------------------------------------------ ramki, ERC
+function renderFrames(v,full){
+ if(full||!$('frT')){v._h='';v.innerHTML=helpBox()+`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><input id="frF" placeholder="filtr: ID, nadawca, tekst albo 'blad'" style="width:280px" value="${esc(fFilter)}"><button data-act="freeze" class="${freeze?'pri':''}">${freeze?'▶ Wznów':'❚❚ Zamroź'}</button>
+  <a href="/api/export?fmt=candump" download><button>Eksport candump (.log)</button></a><a href="/api/export?fmt=csv" download><button>Eksport CSV</button></a></div><div id="frT"></div>`;$('frF').oninput=e=>{fFilter=e.target.value;renderFrames(v)}}
+ if(busy($('frT')))return;const fr=filterFrames(freeze?frozen:S.frames).slice(-250).reverse();
+ setHTML($('frT'),fr.length?tbl(['czas [ms]','nadawca','ID','DLC','dane','znaczenie','wynik','przyjęli'],fr.map(f=>`<tr><td class="m">${ms(f.t)}</td><td>${esc(f.src)}</td><td class="m">${f.ext?f.id+'x':'0x'+f.id}</td><td class="m">${f.dlc}</td><td class="m">${f.data}</td><td>${esc(f.dec)}</td><td class="${f.status==='ok'?'ok':'bad'}">${f.status==='ok'?'OK':esc(f.status)}${f.reason?': '+esc(f.reason):''}</td><td>${esc(f.acc.join(', '))}</td></tr>`)):'<div class="empty">Brak ramek.</div>')}
+function ercHtml(i){return `<div class="erc ${i.level}" data-act="ercsel" data-ids="${i.ids.join(',')}"><b>${i.level==='error'?'✕ BŁĄD':i.level==='warn'?'! UWAGA':'✓ OK'}: ${esc(i.title)}</b>${esc(i.detail)}${i.ref?`<br><small>Źródło: ${esc(i.ref)}</small>`:''}</div>`}
+function renderErc(v){const it=S.erc||[];const o={error:0,warn:1,ok:2};if(busy(v))return;setHTML(v,helpBox()+(it.length?it.slice().sort((a,b)=>o[a.level]-o[b.level]).map(ercHtml).join(''):'<div class="empty">Dodaj elementy, żeby ERC miał co sprawdzać.</div>'))}
+
+// ------------------------------------------------------------ plytka
+function B(){return S.board}
+function boardBar(){const bs=S.parts.filter(p=>p.kind==='board');return `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><span class="mut">Płytka:</span>${bs.map(p=>`<button class="sm ${p.id===board?'pri':''}" data-act="boardtab" data-id="${p.id}" data-tab="${tab}">${esc(p.name)}</button>`).join('')}</div>`}
+function noBoard(v){if(!B()){setHTML(v,helpBox()+'<div class="empty">Brak płytek z kodem. Dodaj płytkę przyciskiem „Płytka z kodem C” po lewej.</div>');return true}
+ if(!B().build_ok&&!['Build','Kod'].includes(tab)){setHTML(v,helpBox()+boardBar()+`<div class="box bad">Ta płytka się nie skompilowała albo nie uruchomiła. Szczegóły w zakładce <a class="loc" data-act="tab" data-tab="Build">Build</a>.</div>`);return true}return false}
+async function loadSyms(force){if(!board)return;const k=board+'|'+(B()?B().build_log.length:0)+'|'+(B()?B().watch.length:0);if(!force&&k===symKey&&syms[board])return;symKey=k;syms[board]=await fetch('/api/symbols?board='+board).then(r=>r.json())}
+async function renderVars(v,full){if(noBoard(v))return;if(busy(v))return;await loadSyms(tab==='Zmienne');const sy=syms[board]||{vars:[]};const w=new Set((B().watch||[]).map(x=>x.name));
+ if(full||!$('vT')){v._h='';v.innerHTML=helpBox()+boardBar()+`<h3>Obserwowane</h3><div id="wT"></div><h3>Wszystkie zmienne globalne</h3><input id="vF" placeholder="szukaj zmiennej" style="width:240px;margin-bottom:6px" value="${esc(vFilter)}"><div id="vT"></div>`;$('vF').oninput=e=>{vFilter=e.target.value;renderVars(v)}}
+ setHTML($('wT'),(B().watch||[]).length?tbl(['zmienna','wartość','hex','typ',''],B().watch.map(x=>`<tr class="${changed(board+'w'+x.name,x.val)?'chg':''}"><td class="m">${esc(x.name)}</td><td class="m"><b>${x.val===null?'<span class="faint">niedostępna</span>':x.val}</b></td><td class="m faint">${Number.isInteger(x.val)?'0x'+(x.val>>>0).toString(16).toUpperCase():''}</td><td class="faint">${esc(x.type||'')}</td><td><button class="star on" data-act="star" data-name="${esc(x.name)}" title="przestań obserwować">★</button></td></tr>`)):'<div class="faint">Kliknij ☆ przy zmiennej poniżej, żeby ją tu przypiąć.</div>');
+ const q=vFilter.toLowerCase();const vs=sy.vars.filter(x=>!q||x.name.toLowerCase().includes(q));
+ const tb=$('vT');if(busy(tb))return;
+ setHTML(tb,tbl(['','zmienna','typ','wartość','zmień (Enter)','plik'],vs.map(x=>{const ok=x.key&&!x.static;return `<tr><td><button class="star ${w.has(x.name)?'on':''}" ${ok?'':'disabled'} data-act="star" data-name="${esc(x.name)}" title="obserwuj">${w.has(x.name)?'★':'☆'}</button></td><td class="m">${esc(x.name)}${x.array?`<span class="faint">[${esc(x.array)}]</span>`:''}</td><td class="faint">${esc(x.type)}${x.static?' · static':''}</td>
+  <td class="m">${ok?`<b>${x.value}</b>`:`<span class="faint" title="${x.static?'static: niewidoczna z zewnątrz':'typ złożony: nieobsługiwany'}">-</span>`}</td><td>${ok?`<input class="vin" data-var="${esc(x.name)}" placeholder="${x.array?'[0] wartość':'wartość'}">`:''}</td><td>${locLink(x.file+':'+x.line)}</td></tr>`}).join('')))}
+document.addEventListener('keydown',async e=>{const t=e.target;if(t.classList&&t.classList.contains('vin')&&e.key==='Enter'){const r=await post('/api/cmd',{line:`ustaw ${slug(part(board).name)} ${t.dataset.var} ${t.value.trim()}`});toast(r.out);t.value='';t.blur();symKey='';poll()}});
+function renderRegs(v,full){if(noBoard(v))return;const r=B().regs||{list:[]};
+ const opts=[...new Set([B().can?B().can.name:''].concat(B().periph_names||[]))].filter(x=>x);
+ if(full||!$('rT')){v._h='';v.innerHTML=helpBox()+boardBar()+`<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;flex-wrap:wrap">peryferium <select id="pSel">${opts.map(n=>`<option ${n===r.periph?'selected':''}>${n}</option>`).join('')}</select>
+  <label class="mut"><input type="checkbox" id="allR" ${allRegs?'checked':''}> pokaż wszystkie rejestry (też nieużywane przez kod)</label></div>
+  <div class="box info" style="font-size:12.5px">Po konfiguracji większość rejestrów stoi w miejscu, tak samo na prawdziwym STM32. Ruch widać w kolumnach <b>aktywność</b> (ile razy kod czytał/pisał rejestr od ostatniego odświeżenia) i <b>chwilowo</b> (bity, które ustawiły się i skasowały między odświeżeniami, np. flaga przerwania <code>DRX</code> skasowana przez ISR). Najlepiej oglądać przy tempie 0,1× albo krokami +1 ms.</div><div id="rT"></div>`;
+  $('pSel').onchange=e=>{periph=e.target.value;e.target.blur();poll().then(()=>renderAll(true))};$('allR').onchange=e=>{allRegs=e.target.checked;poll().then(()=>renderAll(true))}}
+ if(busy($('rT')))return;
+ setHTML($('rT'),tbl(['rejestr','wartość','ustawione pola bitowe','aktywność','chwilowo','ostatni zapis'],r.list.map(x=>{const base=x.name.replace(/\[.*$/,'');const act=x.dr||x.dw;
+  return `<tr class="${changed(board+r.periph+x.name,x.val)?'chg':''}" style="${act?'box-shadow:inset 3px 0 var(--acc)':''}"><td class="m" title="${esc(REGDOC[base]||'')}">${x.name}${REGDOC[base]?' <span class="faint">ⓘ</span>':''}<div class="faint" style="font-size:11px">+0x${x.off}</div></td><td class="m"><b>${x.val}</b></td>
+  <td>${x.fields.map(f=>`<span class="f" title="bity ${f[2]+f[3]-1}:${f[2]} = ${f[1]}${f[0]==='LEC'?' ('+LEC[f[1]]+')':''}">${f[0]}${f[3]>1?'='+f[1]:''}</span>`).join('')||'<span class="faint">0</span>'}</td>
+  <td class="m" title="od startu: odczytów ${x.reads}, zapisów ${x.writes}">${act?`<b style="color:var(--acc)">${x.dr?'R×'+x.dr:''} ${x.dw?'W×'+x.dw:''}</b>`:'<span class="faint">–</span>'}</td>
+  <td>${x.blink.map(b=>`<span class="f" style="border-color:#f59e0b;background:var(--warnb);color:var(--warn)" title="ustawiony na chwilę od ostatniego odświeżenia">${b}</span>`).join('')}</td>
+  <td class="m faint">${x.last_w?`${x.last_w}<div style="font-size:11px">t=${ms(x.last_w_t)} ms</div>`:''}</td></tr>`}))+`<div class="faint" style="font-size:12px;margin-top:6px">Pokazano ${r.list.length} z ${r.total} rejestrów.</div>`)}
+function renderRam(v){if(noBoard(v))return;if(busy(v))return;const m=B().ram;if(!m){setHTML(v,'');return}
+ if(m.kind==='bxcan'){setHTML(v,helpBox()+boardBar()+'<h3>Skrzynki nadawcze (3)</h3>'+tbl(['#','ID','DLC','dane','stan'],m.tx.map(t=>`<tr class="${changed(board+'btx'+t.i,t.id+t.data+t.pending)?'chg':''}"><td>${t.i}</td><td class="m">${t.id}</td><td>${t.dlc}</td><td class="m">${t.data}</td><td class="${t.pending?'warn':''}">${t.pending?'czeka na wysłanie':t.empty?'pusta':'zajęta'}</td></tr>`))+
+  '<h3>Kolejki FIFO (max 3 ramki, pierwsza do odczytu)</h3>'+(m.fifo.length?tbl(['FIFO','#','ID','DLC','dane','filtr (FMI)'],m.fifo.map(t=>`<tr><td>${t.fifo}</td><td>${t.i}</td><td class="m">${t.id}</td><td>${t.dlc}</td><td class="m">${t.data}</td><td>${t.fmi}</td></tr>`)):'<p class="faint">puste</p>')+
+  '<h3>Aktywne filtry (kolejność priorytetu wg RM0090)</h3>'+(m.filters.length?tbl(['bank','pod','FMI','FIFO','typ','ID / lista','maska'],m.filters.map(f=>`<tr><td>${f.bank}</td><td>${f.sub}</td><td>${f.fmi}</td><td>${f.fifo}</td><td>${f.kind}</td><td class="m">${f.a}</td><td class="m">${f.m}</td></tr>`)):'<div class="box warn">Brak aktywnych filtrów (FINIT=1 albo FA1R=0): żadna ramka nie zostanie odebrana.</div>'));return}
+ setHTML(v,helpBox()+boardBar()+`<p class="mut">Message RAM (offset, długość w bajtach): ${Object.entries(m.areas).map(([k,a])=>`${k} [${a[0]}, +${a[1]}]`).join(' · ')}</p><h3>Filtry standardowe</h3>`+
+ tbl(['#','słowo','typ','akcja','ID 1','ID 2 / bufor'],m.filters.map(f=>`<tr><td>${f.i}</td><td class="m">${f.word}</td><td>${f.sfec==7?'-':['zakres','dwa ID','maska','wył.'][f.sft]}</td><td>${{0:'wyłączony',1:'do FIFO0',2:'do FIFO1',3:'odrzuć',7:'do bufora Rx'}[f.sfec]??f.sfec}</td><td class="m">${f.id1}</td><td class="m">${f.id2}</td></tr>`))+
+ '<h3>Bufory nadawcze</h3>'+tbl(['#','ID','DLC','dane','stan'],m.tx.map(t=>`<tr class="${changed(board+'tx'+t.i,t.id+t.data+t.pending)?'chg':''}"><td>${t.i}</td><td class="m">${t.id}</td><td>${t.dlc}</td><td class="m">${t.data}</td><td class="${t.pending?'warn':''}">${t.pending?'czeka (TXBRP)':'wolny'}</td></tr>`))+
+ '<h3>Bufory odbiorcze</h3>'+tbl(['#','ID','DLC','dane','nowe dane','filtr'],m.rx.map(t=>`<tr class="${changed(board+'rx'+t.i,t.id+t.data)?'chg':''}"><td>${t.i}</td><td class="m">${t.id}</td><td>${t.dlc}</td><td class="m">${t.data}</td><td class="${t.new?'warn':''}">${t.new?'tak (bufor zablokowany do odczytu)':''}</td><td>${t.fidx}</td></tr>`))+
+ '<h3>Rx FIFO0</h3>'+(m.fifo0.length?tbl(['#','ID','DLC','dane'],m.fifo0.map(t=>`<tr><td>${t.i}</td><td class="m">${t.id}</td><td>${t.dlc}</td><td class="m">${t.data}</td></tr>`)):'<p class="faint">pusty</p>'))}
+async function openFile(f,line){if(!board)return;curFile=f;pendingLine=line||0;if(tab!=='Kod'||!$('editor')){tab='Kod';drawTabs();renderCode($('view'));return}loadFile(f,line)}
+async function loadFile(f,line){document.querySelectorAll('#flist [data-f]').forEach(d=>d.classList.toggle('sel',d.dataset.f===f));const r=await fetch(`/api/file?board=${board}&path=${encodeURIComponent(f)}`).then(r=>r.json());
+ const ed=$('editor');if(!ed)return;ed.value=r.text||'(nie można otworzyć)';syncGut();$('curName').textContent=f;
+ if(line){const lines=ed.value.split('\n');let pos=0;for(let i=0;i<line-1&&i<lines.length;i++)pos+=lines[i].length+1;ed.focus();ed.setSelectionRange(pos,pos+(lines[line-1]||'').length);ed.scrollTop=Math.max(0,(line-8)*19);syncGut(line)}}
+function syncGut(hl){const ed=$('editor'),g=$('gut');if(!ed||!g)return;const n=ed.value.split('\n').length;let t='';for(let i=1;i<=n;i++)t+=(i===hl?'▶ ':'')+i+'\n';g.textContent=t;g.scrollTop=ed.scrollTop}
+async function renderCode(v){if(!B()){noBoard(v);return}codeBoard=board;v._h='';
+ v.innerHTML=helpBox()+boardBar()+`<div style="display:grid;grid-template-columns:190px 1fr;gap:8px;height:calc(100% - 90px);min-height:360px"><div id="flist" style="overflow:auto"></div><div style="display:flex;flex-direction:column;min-height:0"><div style="display:flex;gap:6px;margin-bottom:6px;align-items:center"><b id="curName" class="mut">wybierz plik z listy</b><span style="flex:1"></span><input id="goto" placeholder="idź do linii" style="width:110px"><button id="bSaveF" class="pri">Zapisz, zbuduj i podmień płytkę</button></div><div class="code" style="flex:1"><div class="gut" id="gut"></div><textarea id="editor" spellcheck="false"></textarea></div></div></div>`;
+ const fl=await fetch('/api/files?board='+board).then(r=>r.json());$('flist').innerHTML=fl.map(f=>`<div class="part ${f===curFile?'sel':''}" data-f="${esc(f)}" style="font-family:var(--mono);font-size:12.5px;padding:4px 7px">${esc(f)}</div>`).join('');
+ $('flist').onclick=e=>{const d=e.target.closest('[data-f]');if(d){curFile=d.dataset.f;loadFile(curFile)}};$('editor').onscroll=()=>{$('gut').scrollTop=$('editor').scrollTop};$('editor').oninput=()=>syncGut();
+ $('goto').onchange=e=>{if(curFile)loadFile(curFile,+e.target.value)};
+ $('bSaveF').onclick=async()=>{if(!curFile)return;await post('/api/save',{board,path:curFile,text:$('editor').value});toast('Kompilacja płytki…');await post('/api/build',{board});await poll();toast(S.board&&S.board.build_ok?'Płytka podmieniona, reszta symulacji działa dalej':'Błąd kompilacji: zakładka Build')};
+ if(curFile){loadFile(curFile,pendingLine);pendingLine=0}}
+function renderLog(v,full){if(noBoard(v))return;
+ if(full||!$('logT')){v._h='';v.innerHTML=helpBox()+boardBar()+`<label class="mut"><input type="checkbox" id="cCalls" ${showCalls?'checked':''}> pokaż też wywołania funkcji</label><div id="logT"></div>`;$('cCalls').onchange=e=>{showCalls=e.target.checked;renderLog(v)}}
+ if(busy($('logT')))return;const col={uwaga:'warn',awaria:'bad',fdcan:'ok',can:'ok',blad:'bad',plytka:'ok',zapis:'ok',konsola:'ok'};
+ const ev=B().events.concat(S.world_events||[]).filter(e=>showCalls||e[1]!=='call').sort((a,b)=>b[0]-a[0]).slice(0,300);
+ setHTML($('logT'),tbl(['czas [ms]','rodzaj','treść','miejsce w kodzie'],ev.map(e=>`<tr><td class="m">${ms(e[0])}</td><td class="${col[e[1]]||'faint'}">${esc(e[1])}</td><td>${esc(e[2])}</td><td>${locLink(e[3])}</td></tr>`))+
+ '<h3>Odczyty i zapisy rejestrów kontrolera CAN (najnowsze u góry)</h3>'+tbl(['czas [ms]','R/W','rejestr','wartość'],B().reglog.slice().reverse().slice(0,200).map(e=>`<tr><td class="m">${ms(e[0])}</td><td>${e[1]==='W'?'zapis':'odczyt'}</td><td class="m">${e[2]}.${e[3]}</td><td class="m">${(e[4]>>>0).toString(16).toUpperCase().padStart(8,'0')}</td></tr>`)))}
+function renderBuild(v){if(!B()){noBoard(v);return}if(busy(v))return;const log=esc(B().build_log||'').replace(/(^|\s)([\w./-]+\.[ch]):(\d+)/g,(m,a,f,l)=>`${a}<a class="loc" data-act="loc" data-loc="${f}:${l}">${f}:${l}</a>`);
+ setHTML(v,helpBox()+boardBar()+`<div class="box ${B().build_ok?'ok':'bad'}">${B().build_ok?'✓ Kompilacja i uruchomienie OK':'✕ Błąd: kliknij plik:linia, aby przejść do kodu'}</div><pre>${log}</pre>`)}
+
+// ------------------------------------------------------------ narzedzia, pomoc
+function renderTools(v){v._h='';v.innerHTML=helpBox()+`<h3>Kalkulator bit timingu</h3><div class="form" style="max-width:540px">
+ <label>kontroler</label><select id="tK"><option value="fdcan">STM32H7 FDCAN (rejestr NBTP)</option><option value="bxcan">STM32F4 bxCAN (rejestr BTR)</option></select>
+ <label>zegar CAN [Hz]</label><input id="tClk" value="64000000"><label>prędkość [bit/s]</label><input id="tBr" value="250000"><label>punkt próbkowania [%]</label><input id="tSp" value="87.5"></div>
+ <div class="btns"><button class="pri" id="tGo">Licz</button><span class="mut" style="align-self:center">Zegar: FDCAN = zegar jądra (np. PLL1Q), bxCAN = APB1.</span></div><div id="tOut"></div>
+ <h3>Obciążenie magistrali</h3><div class="mut" style="margin-bottom:4px">Jedna wiadomość na linię: <code>ID_hex DLC okres_ms</code>, np. <code>2D 8 25</code>. Liczone dla najgorszego przypadku (z bitami wstawianymi).</div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><textarea id="lMsgs" rows="8" style="font-family:var(--mono)">2D 8 25\n4D 8 25\n6D 8 25\n8D 8 25\n29 8 10\n49 8 10\n69 8 10\n89 8 10\n21 8 100\n41 8 100\n61 8 100\n81 8 100</textarea><div><label class="mut">prędkość <input id="lBr" value="250000" style="width:110px"></label><div id="lOut" style="margin-top:6px"></div></div></div>`;
+ $('tGo').onclick=calcBT;$('tK').onchange=()=>{$('tClk').value=$('tK').value==='fdcan'?64000000:42000000;calcBT()};$('lMsgs').oninput=calcLoad;$('lBr').oninput=calcLoad;calcBT();calcLoad()}
+function calcBT(){const k=$('tK').value,clk=+$('tClk').value,br=+$('tBr').value,sp=+$('tSp').value/100;const L=k==='fdcan'?{brp:512,t1:256,t2:128,sjw:128}:{brp:1024,t1:16,t2:8,sjw:4};const res=[];
+ for(let brp=1;brp<=L.brp;brp++){const N=Math.round(clk/(brp*br));if(N<8||N>(1+L.t1+L.t2))continue;const err=Math.abs(clk/(brp*N)-br)/br;if(err>0.001)continue;let t1=Math.round(N*sp)-1,t2=N-1-t1;if(t2<1){t2=1;t1=N-2}if(t1>L.t1){t1=L.t1;t2=N-1-t1}if(t2>L.t2||t1<1)continue;res.push({brp,N,t1,t2,sjw:Math.min(t2,L.sjw),sp:(1+t1)/N})}
+ const inR=r=>r.N>=8&&r.N<=25?0:1;res.sort((a,b)=>inR(a)-inR(b)||Math.abs(a.sp-sp)-Math.abs(b.sp-sp)||b.N-a.N);const top=res.slice(0,6);
+ if(!top.length){$('tOut').innerHTML='<div class="box bad">Brak dokładnego rozwiązania (błąd prędkości &lt; 0,1 %). Zmień zegar albo prędkość.</div>';return}
+ $('tOut').innerHTML=tbl(['preskaler','tq/bit','TSEG1','TSEG2','SJW','próbkowanie','rejestr','kod C'],top.map(r=>{let reg,code;if(k==='fdcan'){reg='NBTP=0x'+(((r.sjw-1)<<25|(r.brp-1)<<16|(r.t1-1)<<8|(r.t2-1))>>>0).toString(16).toUpperCase().padStart(8,'0');code=`FDCAN1->NBTP = (${r.sjw-1}u &lt;&lt; FDCAN_NBTP_NSJW_Pos) | (${r.brp-1}u &lt;&lt; FDCAN_NBTP_NBRP_Pos) | (${r.t1-1}u &lt;&lt; FDCAN_NBTP_NTSEG1_Pos) | (${r.t2-1}u &lt;&lt; FDCAN_NBTP_NTSEG2_Pos);`}
+  else{reg='BTR=0x'+(((r.sjw-1)<<24|(r.t2-1)<<20|(r.t1-1)<<16|(r.brp-1))>>>0).toString(16).toUpperCase().padStart(8,'0');code=`CAN1->BTR = (${r.sjw-1}u &lt;&lt; CAN_BTR_SJW_Pos) | (${r.t1-1}u &lt;&lt; CAN_BTR_TS1_Pos) | (${r.t2-1}u &lt;&lt; CAN_BTR_TS2_Pos) | ${r.brp-1}u;`}
+  return `<tr><td>${r.brp}</td><td>${r.N}</td><td>${r.t1}</td><td>${r.t2}</td><td>${r.sjw}</td><td>${(r.sp*100).toFixed(1)} %</td><td class="m">${reg}</td><td class="m" style="font-size:11.5px">${code}</td></tr>`}))+'<div class="mut" style="font-size:12.5px">Na górze rozwiązania z 8–25 kwantami na bit. W tabeli wartości rzeczywiste; do rejestru wpisuje się je minus 1 (kod C już to uwzględnia).</div>'}
+function calcLoad(){const br=+$('lBr').value;let tot=0,rows=[];$('lMsgs').value.split('\n').forEach(l=>{const p=l.trim().split(/\s+/);if(p.length<3)return;const dlc=Math.min(8,+p[1]),per=+p[2];if(!per)return;const bits=47+8*dlc+Math.floor((34+8*dlc-1)/4)+3;const u=bits/br/(per/1000)*100;tot+=u;rows.push(`<tr><td class="m">0x${esc(p[0])}</td><td>${dlc}</td><td>${per}</td><td>${bits}</td><td>${u.toFixed(2)} %</td></tr>`)});
+ $('lOut').innerHTML=`<div class="box ${tot>70?'bad':tot>50?'warn':'ok'}">Razem: <b>${tot.toFixed(1)} %</b> ${tot>70?'(za dużo: rosną opóźnienia)':tot>50?'(rozsądnie, ale uważaj)':'(OK)'}</div>`+tbl(['ID','DLC','okres ms','bity max','udział'],rows)}
+function renderHelp(v){if(v._h==='help')return;v._h='help';v.innerHTML=`<div style="max-width:860px">
+ <h3>Szybki start</h3><ol class="steps"><li>Dodaj płytkę (<b>Płytka z kodem C</b> po lewej) i resztę magistrali: ODrive, węzeł (np. PC), dwa terminatory 120 Ω na końcach kabla.</li><li><b>▶ Start</b> uruchamia czas, <b>+1/+10/+100 ms</b> przesuwa go krokami, <b>⟲ Reset</b> zaczyna od zera.</li><li>Patrz na <b>Schemat</b> (co działa), <b>Przepływ</b> (kto do kogo wysyła), <b>ERC</b> (błędy schematu) i <b>Zmienne</b> (wartości w Twoim kodzie).</li><li>Steruj ręcznie w <b>konsoli</b> na dole: wpisz <kbd>pomoc</kbd>, potem np. <kbd>odrive 1 predkosc 2</kbd>, <kbd>czekaj 500</kbd>, <kbd>ramki</kbd>. <kbd>Tab</kbd> podpowiada argumenty.</li><li>Powtarzalne testy zapisz jako <b>scenariusz</b> (zakładka obok konsoli), z <kbd>oczekuj</kbd> do sprawdzania wyników.</li></ol>
+ <h3>Przykładowe komendy (kliknij, żeby wstawić)</h3><div class="btns">${['pomoc','stan','czekaj 500','odrive * stan closed_loop','odrive 1 predkosc 2.5','odrive 2 zasilanie off','ramki','awaria uszkodz 5'].map(c=>`<button class="sm" data-act="cmdins" data-cmd="${c}"><code>${c}</code></button>`).join('')}</div>
+ <h3>Słowniczek</h3><dl class="gl">
+ <dt>Ramka</dt><dd>Jedna wiadomość na magistrali: identyfikator (ID), do 8 bajtów danych, suma kontrolna i potwierdzenie odbioru.</dd>
+ <dt>ID (identyfikator)</dt><dd>Mówi, czym jest wiadomość, i ustala priorytet: gdy dwa węzły nadają naraz, wygrywa niższe ID (arbitraż). Każde ID powinien nadawać tylko jeden węzeł. W ODrive: ID = (node_id &lt;&lt; 5) | komenda, np. 0x2D = oś 1, ustaw prędkość.</dd>
+ <dt>ACK</dt><dd>Potwierdzenie: każdy węzeł, który poprawnie odebrał ramkę, potwierdza ją, nawet jeśli jego filtr ją potem odrzuci. Samotny nadawca nie dostaje ACK.</dd>
+ <dt>Filtr</dt><dd>Sprzętowe sito w kontrolerze: przepuszcza do programu tylko ramki o wybranych ID.</dd>
+ <dt>TEC / REC</dt><dd>Liczniki błędów nadawania i odbioru. Błąd: +8 (nadawca) albo +1 (odbiorca), poprawna ramka: −1.</dd>
+ <dt>Error Active / Warning / Passive</dt><dd>Stany węzła wg liczników: normalny (&lt;96), ostrzeżenie (≥96), pasywny (≥128): pasywny nie może już niszczyć cudzych ramek i musi czekać po każdej swojej.</dd>
+ <dt>Bus-Off</dt><dd>TEC &gt; 255: węzeł odłącza się od magistrali. STM32H7 wraca dopiero, gdy program skasuje INIT (i po 129×11 bitach ciszy); bxCAN może wracać sam (ABOM).</dd>
+ <dt>Terminacja 120 Ω</dt><dd>Rezystor między CANH a CANL na każdym z dwóch końców kabla. Razem dają 60 Ω (to zmierzysz multimetrem przy wyłączonym zasilaniu). Bez nich sygnał się odbija.</dd>
+ <dt>GND</dt><dd>Wspólna masa: przewód masy prowadzony razem z CANH/CANL. Bez niej różnica potencjałów może wyjść poza zakres odbiornika.</dd>
+ <dt>Transceiver</dt><dd>Układ (np. TJA1042) zamieniający sygnał TX/RX mikrokontrolera na różnicowy CANH/CANL.</dd>
+ <dt>Bit timing, punkt próbkowania</dt><dd>Podział jednego bitu na kwanty czasu; punkt próbkowania (zwykle ~87,5 %) to moment odczytu bitu. Wszystkie węzły muszą mieć tę samą prędkość.</dd>
+ <dt>FIFO / bufor / skrzynka</dt><dd>Miejsca w kontrolerze na ramki: do wysłania (bufory/skrzynki Tx) i odebrane (bufory Rx, kolejki FIFO).</dd>
+ <dt>Heartbeat</dt><dd>Cykliczna ramka „żyję” z ODrive (co 100 ms) ze stanem osi i błędami.</dd>
+ <dt>Przerwanie (ISR)</dt><dd>Funkcja wołana przez sprzęt, gdy coś się wydarzy (np. przyszła ramka). Musi skasować flagę, inaczej woła się w kółko.</dd></dl>
+ <h3>Ograniczenia</h3><div class="mut">To model, nie pomiar: zachowanie kontrolerów jest odtworzone z dokumentacji ST/Bosch, a fizyka kabla jest sprawdzana regułami (ERC), nie symulowana napięciowo. Przed wgraniem na sprzęt i tak sprawdź analizatorem CAN.</div></div>`}
+
+// ------------------------------------------------------------ inspektor
+function physForm(e){const tr=['TJA1042','TJA1051','MCP2562','SN65HVD230','wbudowany'];
+ return `<h3>Połączenie z magistralą</h3><div class="form"><label>pozycja na kablu</label><input data-f="pos_m" type="number" step="0.05" value="${e.pos_m}">
+ ${e.type==='terminator'?'':`<label title="długość przewodu od kabla głównego do płytki">odgałęzienie [m]</label><input data-f="stub_m" type="number" step="0.05" value="${e.stub_m}">
+ <label>terminacja 120 Ω</label><label style="color:var(--fg)"><input data-f="termination" type="checkbox" ${e.termination?'checked':''}> rezystor na płytce włączony</label>
+ <label>przewód GND</label><label style="color:var(--fg)"><input data-f="gnd" type="checkbox" ${e.gnd!==false?'checked':''}> masa podłączona</label>
+ <label>transceiver</label><select data-f="transceiver">${tr.map(t=>`<option ${t===e.transceiver?'selected':''}>${t}</option>`).join('')}</select>
+ <label>zasilanie [V]</label><input data-f="vcc" type="number" step="0.1" value="${e.vcc}"><label title="dokładność kwarcu; kwarc ~50 ppm, wewnętrzny RC ~10000 ppm">zegar [ppm]</label><input data-f="osc_ppm" type="number" value="${e.osc_ppm}">`}</div>`}
+function bindPhys(id){document.querySelectorAll('#insp [data-f]').forEach(inp=>inp.onchange=()=>{const f=inp.dataset.f;let v=inp.type==='checkbox'?inp.checked:inp.type==='number'?+inp.value:inp.value;if(f==='bitrate'||f==='node_id')v=+v;post('/api/system/patch',{id,changes:{[f]:v}}).then(()=>{inp.blur();poll()})})}
+function callWidget(e){const sy=syms[e.id];if(!sy)return '<div class="faint">wczytywanie listy funkcji…</div>';const fs=sy.funcs.filter(f=>!f.static&&!['main'].includes(f.name));
+ return `<div class="form"><label>funkcja</label><select id="fnSel"><option value="">wybierz…</option>${fs.map(f=>`<option value="${esc(f.name)}">${esc(f.name)}(${f.params.map(p=>esc(p.type)).join(', ')})</option>`).join('')}</select></div><div id="fnArgs"></div><div class="btns"><button class="pri" data-act="call">Wywołaj</button></div><div id="callRes" class="mut" style="font-family:var(--mono);font-size:12.5px">${lastCall}</div>
+ ${sy.funcs.some(f=>f.static)?`<div class="faint" style="font-size:12px">Funkcje <b>static</b> (${sy.funcs.filter(f=>f.static).length}) nie są widoczne z zewnątrz skompilowanego kodu, więc ich tu nie ma.</div>`:''}`}
+function fnArgs(){const fn=$('fnSel').value;if(fn!==fnState.fn)fnState={fn,args:[]};const f=(syms[sel]||{funcs:[]}).funcs.find(x=>x.name===fn);$('fnArgs').innerHTML=f?`<div class="form" style="margin-top:6px">${f.params.map((p,i)=>`<label>${esc(p.name||'arg'+(i+1))}</label><input data-arg="${i}" value="${esc(fnState.args[i]||'')}" placeholder="${esc(p.type)}${p.key?'':' (nieobsługiwany)'}" ${p.key?'':'disabled'}>`).join('')||'<span class="faint" style="grid-column:1/3">bez argumentów</span>'}</div><div class="faint" style="font-size:12px;margin-top:4px">zwraca: ${esc(f.ret)} · ${locLink(f.file+':'+f.line)}</div>`:''}
+async function doCall(){const fn=$('fnSel').value;if(!fn){toast('Wybierz funkcję z listy');return}const args=[...document.querySelectorAll('#fnArgs [data-arg]')].map(i=>i.value.trim()||'0');
+ const r=await post('/api/cmd',{line:`wywolaj ${slug(part(sel).name)} ${fn} ${args.join(' ')}`});lastCall=`<span class="${r.ok?'ok':'bad'}">${esc(r.out)}</span>`;if($('callRes'))$('callRes').innerHTML=lastCall;conLog('wywolaj '+fn+' '+args.join(' '),r);poll()}
+async function drawInsp(force){const i=$('insp');if(!force&&busy(i))return;const e=sel&&cfg(sel),p=sel&&part(sel);
+ if(!e){$('inspTitle').textContent='Szczegóły';setHTML(i,`<div class="box info">Kliknij element na schemacie albo na liście po lewej, żeby zobaczyć jego stan i opcje.</div><h3>Magistrala</h3><div class="kv"><span>długość kabla</span><span>${S.system.bus.length_m} m</span><span>obciążenie</span><span>${S.bus_load} %</span><span>ramek w logu</span><span>${S.frames.length}</span></div>
+  <h3>Awarie magistrali</h3><div class="btns"><button data-act="inj" data-t="bus" data-w="corrupt" data-v="1">Zepsuj 1 ramkę</button><button data-act="inj" data-t="bus" data-w="corrupt" data-v="20">Zepsuj 20 ramek</button></div><div class="mut" style="font-size:12.5px">Zepsuta ramka: odbiorcy +1 REC, nadawca +8 TEC i ponawia wysyłkę.</div>`);return}
+ $('inspTitle').textContent=p?.name||e.type;let h='';
+ if(p&&p.kind==='board'){if(!syms[e.id]){fetch('/api/symbols?board='+e.id).then(r=>r.json()).then(s=>{syms[e.id]=s;drawInsp(true)})}
+  h+=`<div class="box ${STATE_CLS(p)==='ok'?'ok':STATE_CLS(p)==='warn'?'warn':'bad'}"><b>${STATE_TXT(p)}</b>${p.bus_off?' – kontroler odłączył się od magistrali (TEC > 255).':p.passive?' – dużo błędów (licznik ≥ 128), węzeł nie niszczy cudzych ramek.':p.init?' – kontroler CAN nie jest włączony (INIT=1).':''}</div>
+  <div class="kv"><span>mikrokontroler</span><span>${esc(p.mcu||'-')} · ${esc(p.can_name||'')} (${esc(p.ctrl||'')})</span><span>kod</span><span title="${esc(e.project||(e.config&&e.config.root)||'')}">${esc((e.project||(e.config&&e.config.root)||'').split(/[\\/]/).slice(-2).join('/'))}</span>
+  <span>prędkość</span><span>${p.bitrate?p.bitrate/1000+' kbit/s':'– (CAN wyłączony)'}</span><span>liczniki TEC / REC</span><span>${p.tec??'-'} / ${p.rec??'-'}</span><span>ostatni błąd</span><span>${p.lec!==undefined?LEC[p.lec]:'-'}</span>
+  <span>wysłane / odebrane</span><span>${p.tx_sent??0} / ${p.rx_stored??0}</span><span>odrzucone filtrem</span><span>${p.rx_filtered_out??0}</span><span>zgubione</span><span class="${p.rx_dropped?'bad':''}">${p.rx_dropped??0}</span></div>
+  <div class="btns"><button class="sm" data-act="boardtab" data-id="${e.id}" data-tab="Zmienne">Zmienne</button><button class="sm" data-act="boardtab" data-id="${e.id}" data-tab="Rejestry">Rejestry</button><button class="sm" data-act="boardtab" data-id="${e.id}" data-tab="Kod">Kod</button><button class="sm" data-act="buildone" data-id="${e.id}">Zbuduj i podmień</button></div>`;
+  if(e.id===board&&B()&&B().warnings&&B().warnings.length)h+='<h3>Uwagi do kodu</h3>'+B().warnings.slice().reverse().map(w=>`<div class="box warn">${esc(w.msg)}<br>${locLink(w.loc,w.func)} <span class="faint">t=${ms(w.t)} ms</span></div>`).join('');
+  h+=`<h3>Wywołaj funkcję C</h3>${callWidget(e)}<h3>Awarie</h3><div class="btns"><button class="sm" data-act="inj" data-t="${e.id}" data-w="force_tec" data-v="100">TEC=100 (ostrzeżenie)</button><button class="sm" data-act="inj" data-t="${e.id}" data-w="force_tec" data-v="130">TEC=130 (pasywny)</button><button class="sm" data-act="inj" data-t="${e.id}" data-w="force_tec" data-v="260">TEC=260 (Bus-Off)</button></div>`;
+  if(e.id===board&&B()&&B().config)h+=cfgForm(B().config)}
+ else if(p&&p.kind==='odrive'){h+=`<div class="box ${p.online===false?'bad':p.error?'warn':'ok'}"><b>${p.online===false?'wyłączony':esc(p.state_name)}</b>${p.error?' – błąd osi 0x'+p.error.toString(16):''}</div><div class="kv"><span>zadana prędkość</span><span>${p.input_vel} obr/s</span><span>prędkość</span><span>${p.vel} obr/s</span><span>pozycja</span><span>${p.pos} obr</span><span>odebrane komendy</span><span>${p.rx}</span><span>TEC / REC</span><span>${p.tec} / ${p.rec}</span></div>
+  <div class="form" style="margin-top:8px"><label>node_id</label><input data-f="node_id" type="number" min="0" max="63" value="${p.node_id}"><label>prędkość CAN</label><select data-f="bitrate">${[125000,250000,500000,1000000].map(b=>`<option value="${b}" ${b===p.bitrate?'selected':''}>${b/1000} kbit/s</option>`).join('')}</select></div>
+  <h3>Steruj / awarie</h3><div class="btns"><button class="sm" data-act="cmdins" data-cmd="odrive ${p.node_id} predkosc ">ustaw prędkość…</button><button class="sm" data-act="cmdins" data-cmd="odrive ${p.node_id} stan closed_loop">CLOSED_LOOP</button><button class="sm" data-act="inj" data-t="${e.id}" data-w="error" data-v="1">wstrzyknij błąd</button><button class="sm" data-act="inj" data-t="${e.id}" data-w="mute_hb" data-v="${!p.mute_hb}">${p.mute_hb?'włącz':'wycisz'} heartbeat</button><button class="sm" data-act="inj" data-t="${e.id}" data-w="power" data-v="${!p.online}">${p.online?'odłącz':'podłącz'} zasilanie</button><button class="sm" data-act="inj" data-t="${e.id}" data-w="watchdog_ms" data-v="${p.watchdog_ms?0:200}">watchdog ${p.watchdog_ms?'wyłącz':'200 ms'}</button></div>
+  <div class="faint" style="font-size:12px">Model uproszczony (protokół CANSimple). Więcej opcji: konsola, komenda <code>odrive</code>.</div>`}
+ else if(p&&p.kind==='generic'){h+=`<div class="kv"><span>wysłane</span><span>${p.sent}</span><span>odebrane</span><span>${p.received}</span><span>w kolejce</span><span>${p.queued}</span><span>TEC / REC</span><span>${p.tec} / ${p.rec}</span></div>
+  <div class="form" style="margin-top:8px"><label>nazwa</label><input data-f="name" value="${esc(p.name)}"><label>prędkość CAN</label><select data-f="bitrate">${[125000,250000,500000,1000000].map(b=>`<option value="${b}" ${b===p.bitrate?'selected':''}>${b/1000} kbit/s</option>`).join('')}</select></div>
+  <h3>Wyślij ramkę</h3><div class="btns"><button class="sm" data-act="cmdins" data-cmd="wyslij ${slug(p.name)} 0x2D 00 00 00 40 00 00 00 00">ODrive 1: prędkość 2 obr/s</button><button class="sm" data-act="cmdins" data-cmd="wyslij ${slug(p.name)} 0x27 08 00 00 00">ODrive 1: CLOSED_LOOP</button><button class="sm" data-act="cmdins" data-cmd="wyslij ${slug(p.name)} ">własna ramka…</button></div>
+  <div class="faint" style="font-size:12px">Przyciski wstawiają komendę do konsoli na dole; Enter wysyła.</div><h3>Awarie</h3><div class="btns"><button class="sm" data-act="inj" data-t="${e.id}" data-w="power" data-v="${!p.online}">${p.online?'odłącz':'podłącz'}</button></div>`}
+ else h+=`<div class="box info">Rezystor 120 Ω między CANH a CANL. Na magistrali powinny być dokładnie dwa, na obu końcach kabla.</div>`;
+ h+=physForm(e)+`<div class="btns" style="margin-top:12px"><button class="danger sm" data-act="del" data-id="${e.id}">Usuń ze schematu</button></div>`;
+ setHTML(i,h);bindPhys(e.id);bindCfg();if($('fnSel')){if($('fnSel').value!==fnState.fn){$('fnSel').value=fnState.fn;if(fnState.fn)fnArgs()}$('fnSel').onchange=fnArgs}}
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.arg!==undefined)fnState.args[+e.target.dataset.arg]=e.target.value});
+function cfgForm(c){const lines=a=>(a||[]).join('\n');
+ return `<details id="cfgD" ${cfgOpen||!B().build_ok?'open':''}><summary>Ustawienia kompilacji płytki</summary><div class="form">
+ <label>mikrokontroler</label><select id="cFam"><option value="h7" ${c.family==='h7'?'selected':''}>STM32H7 (FDCAN)</option><option value="f4" ${c.family==='f4'?'selected':''}>STM32F4 (bxCAN)</option></select>
+ <label>nagłówek / define</label><div style="display:flex;gap:4px"><input id="cHdr" value="${esc(c.device_header)}"><input id="cDef" value="${esc(c.device_define)}"></div><label>kontroler CAN</label><input id="cCan" value="${esc(c.can_peripheral)}">
+ <label>folder kodu</label><input id="cRoot" value="${esc(c.root)}" style="font-family:var(--mono)"><label>pliki .c</label><textarea id="cSrc" rows="4" style="font-family:var(--mono)">${esc(lines(c.sources))}</textarea>
+ <label>katalogi .h</label><textarea id="cInc" rows="2" style="font-family:var(--mono)">${esc(lines(c.include_dirs))}</textarea><label>define (-D)</label><textarea id="cDefs" rows="1" style="font-family:var(--mono)">${esc(lines(c.defines))}</textarea>
+ <label>start od funkcji</label><input id="cInit" value="${esc((c.init||[]).join(', '))}"><label>zegar CAN [Hz]</label><input id="cCk" type="number" value="${c.can_kernel_hz}"><label>SystemCoreClock</label><input id="cCore" type="number" value="${c.core_hz}"><label>zegar timerów</label><input id="cTim" type="number" value="${c.timer_clk_hz}">
+ <label title="pętle opóźniające zastąp przesunięciem czasu">podmiana funkcji</label><textarea id="cRep" rows="2" style="font-family:var(--mono)" placeholder="delay_ms = cansim_advance_us(ms * 1000u);">${esc(Object.entries(c.replace_functions||{}).map(([k,v])=>k+' = '+v).join('\n'))}</textarea></div>
+ <div class="btns"><button class="pri" id="bCfg">Zapisz i zbuduj</button><button id="bAuto">Wykryj pliki .c ponownie</button></div>
+ <div class="faint" style="font-size:12px">Zegary nie są emulowane: wpisz wartości wynikające z Twojego clock.c. Funkcje-pętle opóźniające podmień (np. <code>delay_ms = cansim_advance_us(ms * 1000u);</code>), inaczej czas płynie bardzo wolno.</div></details>`}
+function bindCfg(){const d=$('cfgD');if(!d)return;d.ontoggle=()=>{cfgOpen=d.open};const split=t=>t.split(/[\n,]/).map(x=>x.trim()).filter(x=>x);
+ $('bCfg').onclick=async()=>{const rep={};$('cRep').value.split('\n').forEach(l=>{const i=l.indexOf('=');if(i>0)rep[l.slice(0,i).trim()]=l.slice(i+1).trim()});
+  const ch={family:$('cFam').value,device_header:$('cHdr').value.trim(),device_define:$('cDef').value.trim(),can_peripheral:$('cCan').value.trim(),root:$('cRoot').value.trim(),sources:split($('cSrc').value),include_dirs:split($('cInc').value),defines:split($('cDefs').value),init:split($('cInit').value),can_kernel_hz:+$('cCk').value,core_hz:+$('cCore').value,timer_clk_hz:+$('cTim').value,replace_functions:rep};
+  if(B().config.family!==ch.family)['device_header','device_define','can_peripheral','can_kernel_hz','core_hz','timer_clk_hz'].forEach(k=>delete ch[k]);
+  document.activeElement.blur();toast('Kompilacja…');const r=await post('/api/board/config',{id:board,changes:ch});toast(r.msg==='ok'?'Zbudowano i podmieniono płytkę':r.msg);syms={};await poll();renderAll(true)};
+ $('bAuto').onclick=async()=>{const fl=await fetch('/api/files?board='+board).then(r=>r.json());$('cSrc').value=fl.filter(f=>f.endsWith('.c')&&!/(^|\/)(system_stm32|startup_)/i.test(f)&&!f.startsWith('Drivers/')).join('\n');$('cSrc').focus()}}
+
+// ------------------------------------------------------------ konsola
+const hist=JSON.parse(localStorage.getItem('cansim_hist')||'[]');let hi=hist.length,sugg=[],si=-1,sTimer=null;
+function conLog(cmd,r){const o=$('conOut');const d=document.createElement('div');d.innerHTML=`<span class="cmd">&gt; ${esc(cmd)}</span>\n<span class="${r.ok?'okl':'err'}">${esc(r.out)}</span>`;o.appendChild(d);while(o.children.length>300)o.firstChild.remove();o.scrollTop=o.scrollHeight}
+async function conRun(){const i=$('conIn');const l=i.value.trim();if(!l)return;hist.push(l);while(hist.length>100)hist.shift();localStorage.setItem('cansim_hist',JSON.stringify(hist));hi=hist.length;i.value='';hideSugg();
+ const r=await post('/api/cmd',{line:l});conLog(l,r);symKey='';poll()}
+async function suggest(){const i=$('conIn');if(!i.value.trim()){hideSugg();$('usage').innerHTML='';return}const r=await fetch('/api/complete?line='+encodeURIComponent(i.value)).then(r=>r.json());sugg=r.items||[];si=-1;
+ $('usage').innerHTML=`${esc(r.usage||'')}${r.note?' <span style="color:var(--fg)">· '+esc(r.note)+'</span>':''}${r.help?' <span class="faint">· '+esc(r.help)+'</span>':''}`;
+ const s=$('sugg');if(!sugg.length||document.activeElement!==i){s.style.display='none';return}s.innerHTML=sugg.map((x,k)=>`<div data-k="${k}"><b>${esc(x.value)}</b><span>${esc(x.hint||'')}</span></div>`).join('');s.style.display='block'}
+function hideSugg(){$('sugg').style.display='none'}
+function applySugg(k){const i=$('conIn');const x=sugg[k];if(!x)return;const parts=i.value.split(' ');parts[parts.length-1]=x.value;i.value=parts.join(' ')+' ';i.focus();suggest()}
+$('conIn').addEventListener('input',()=>{clearTimeout(sTimer);sTimer=setTimeout(suggest,80)});$('conIn').addEventListener('focus',()=>{if($('conIn').value)suggest()});$('conIn').addEventListener('blur',()=>setTimeout(hideSugg,150));
+$('sugg').addEventListener('mousedown',e=>{const d=e.target.closest('[data-k]');if(d){e.preventDefault();applySugg(+d.dataset.k)}});
+$('conIn').addEventListener('keydown',e=>{const s=$('sugg'),open=s.style.display==='block'&&sugg.length;
+ if(e.key==='Tab'){e.preventDefault();if(sugg.length)applySugg(si>=0?si:0);return}
+ if(e.key==='Enter'){e.preventDefault();if(open&&si>=0){applySugg(si);return}conRun();return}
+ if(e.key==='Escape'){hideSugg();return}
+ if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(open){si=(si+(e.key==='ArrowDown'?1:-1)+sugg.length)%sugg.length;[...s.children].forEach((c,k)=>c.classList.toggle('on',k===si));s.children[si].scrollIntoView({block:'nearest'});return}
+  hi=Math.max(0,Math.min(hist.length,hi+(e.key==='ArrowUp'?-1:1)));$('conIn').value=hist[hi]||'';}});
+async function scnRun(){const t=$('scnText').value;localStorage.setItem('cansim_scn',t);$('scnRes').innerHTML='<span class="mut">wykonuję…</span>';const r=await post('/api/script',{text:t});
+ $('scnRes').innerHTML=`<div class="box ${r.ok?'ok':'bad'}" style="font-family:inherit">${r.ok?'✓ Scenariusz przeszedł':'✕ Coś się nie zgadza (czerwone linie)'}</div>`+r.results.map(x=>`<div style="margin:3px 0"><span class="${x.ok?'ok':'bad'}">${x.ok?'✓':'✕'}</span> <span class="faint">${x.line}:</span> <b>${esc(x.cmd)}</b>${x.out&&x.out!=='ok'?`<pre class="${x.ok?'mut':'bad'}" style="margin-left:18px">${esc(x.out)}</pre>`:''}</div>`).join('');poll()}
+$('scnText').value=localStorage.getItem('cansim_scn')||SCN_EXAMPLE;
+$('scnSel').onchange=e=>{const n=e.target.value;if(n&&S.system.scenarios&&S.system.scenarios[n]!==undefined)$('scnText').value=S.system.scenarios[n];e.target.value='';e.target.blur()};
+ACT.scnsave=async()=>{const n=prompt('Nazwa scenariusza:','test');if(!n)return;await post('/api/scenario/save',{name:n,text:$('scnText').value});toast('Zapisano „'+n+'” w schemacie (zapisz też schemat na dysku: Zapisz)');poll()};
+
+// ------------------------------------------------------------ podpowiedz "co sie dzieje"
+function hint(){const el=$('hint');let cls='info',t='';const ps=S.parts;const er=(S.erc||[]).filter(i=>i.level==='error');const bo=ps.filter(p=>p.bus_off);const nb=ps.filter(p=>p.kind==='board'&&!p.build_ok);
+ if(!ps.length)t='Zacznij od dodania płytki z kodem (lewy panel) albo otwórz przykład.';
+ else if(nb.length){cls='bad';t=`Płytka „${nb[0].name}” nie działa (błąd kompilacji lub uruchomienia). Zobacz zakładkę Build.`}
+ else if(bo.length){cls='bad';t=`${bo.map(p=>p.name).join(', ')}: BUS-OFF – węzeł odłączył się od magistrali po serii błędów.`}
+ else if(er.length){cls='warn';t=`ERC: ${er[0].title}${er.length>1?` (i ${er.length-1} więcej)`:''}. Kliknij czerwony znacznik ERC u góry.`}
+ else if(!S.running&&S.t_ns===0)t='Gotowe. Naciśnij ▶ Start (albo spację) lub +100 ms, żeby ruszyć symulację. Na dole konsola: wpisz „pomoc”.';
+ else{const recent=S.frames.filter(f=>f.t>S.t_ns-1e9);const bad=recent.filter(f=>f.status!=='ok').length;cls=bad?'warn':'ok';
+  t=`${S.running?'Symulacja działa':'Pauza'}: ${ps.filter(p=>p.kind!=='terminator'&&p.online!==false&&!p.init).length} węzłów aktywnych, ${recent.length} ramek w ostatniej sekundzie${bad?`, w tym ${bad} z błędem`:', bez błędów'}. Obciążenie ${S.bus_load} %.`}
+ el.className=cls;el.querySelector('.ic').textContent=cls==='ok'?'✓':cls==='info'?'i':'!';$('hintTxt').textContent=t}
+
+// ------------------------------------------------------------ petla
+function renderAll(full){if(!S)return;drawTabs();const v=$('view');
+ const f={Schemat:renderSchem,Przepływ:renderSeq,Ramki:renderFrames,ERC:renderErc,Zmienne:renderVars,Rejestry:renderRegs,'Pamięć CAN':renderRam,Kod:null,Dziennik:renderLog,Build:renderBuild,Narzędzia:null,Pomoc:renderHelp}[tab];
+ if(full)v._h='';
+ if(tab==='Kod'){if(full&&(codeBoard!==board||!$('editor')))renderCode(v)}else if(tab==='Narzędzia'){if(full)renderTools(v)}else if(f)f(v,full);
+ if(!busy($('parts')))drawParts();drawInsp(full);hint()}
+async function getState(){S=await fetch('/api/state?'+new URLSearchParams({board:board||'',periph:periph||'',allregs:allRegs?'1':'0'})).then(r=>r.json());if(!board&&S.board)board=S.board.id;if(board&&!S.parts.some(p=>p.id===board))board=S.board?S.board.id:null;return S}
+async function poll(){try{await getState();
+ $('cTime').textContent=ms(S.t_ns)+' ms';$('cLoad').textContent=S.bus_load;$('sysName').textContent=S.name||'';
+ $('bRun').textContent=S.running?'❚❚ Pauza':'▶ Start';if(document.activeElement!==$('speed')&&S.speed!==undefined&&[...$('speed').options].some(o=>+o.value===S.speed))$('speed').value=String(S.speed);$('bRun').classList.toggle('stop',S.running);
+ const ne=(S.erc||[]).filter(i=>i.level==='error').length,nw=(S.erc||[]).filter(i=>i.level==='warn').length;const c=$('cErc');c.className='chip '+(ne?'bad':nw?'warn':'ok');c.innerHTML=`ERC: <b>${ne}</b> ${pl(ne,'błąd','błędy','błędów')} · <b>${nw}</b> ${pl(nw,'uwaga','uwagi','uwag')}`;
+ const ss=$('scnSel');const names=Object.keys(S.system.scenarios||{});if(ss.options.length-1!==names.length)ss.innerHTML='<option value="">zapisane…</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');
+ if(sel&&!cfg(sel))sel=null;renderAll(false)}catch(e){console.error(e)}}
+async function loop(){await poll();setTimeout(loop,S&&S.running?350:1000)}
+themeLbl();
+{const h=new URLSearchParams(location.hash.slice(1));if(h.get('tab'))tab=h.get('tab');if(h.get('sel')){sel=h.get('sel');if(sel.startsWith('b'))board=sel}}
+getState().then(()=>{renderAll(true);loop();conLog('pomoc',{ok:true,out:'Konsola gotowa. Wpisz „pomoc”, żeby zobaczyć komendy. Tab podpowiada argumenty.'});const h=new URLSearchParams(location.hash.slice(1));if(h.get('open'))openFile(h.get('open'),12)});
+</script></body></html>
